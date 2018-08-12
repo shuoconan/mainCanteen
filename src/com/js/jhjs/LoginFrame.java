@@ -1,4 +1,5 @@
 package com.js.jhjs;
+import com.js.jhjs.img.*;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -22,12 +23,13 @@ import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-public class LoginFrame extends JFrame implements FocusListener,MouseListener,ListSelectionListener{
+public class LoginFrame implements MouseListener,ListSelectionListener{
     private JFrame frame = null;
     private JPanel panel = new JPanel();
     private JPanel panel2 = new JPanel();
     private JLabel label ;
     private JLabel jLabel_jc;
+    private JLabel jLabel_wm;
     private JLayeredPane layeredPane = new JLayeredPane();
     private ArrayList<String> userlist = new ArrayList<String>();
     private JLabel userJlabel = null;
@@ -51,7 +53,7 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
     
     
 	public LoginFrame() {
-		this.initLoginFrame("F://java2017proj//mainCanteen//img//1.jpg");
+		this.initLoginFrame("img/1.jpg");
 	}
 	public void initLoginFrame(String bgPathname){
 		//frame初始设置
@@ -63,16 +65,25 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 		//载入背景图片
 		this.label = new JLabel(new ImageIcon(bgPathname));
 		this.label.setBounds(0, 0, 1280, 1024);
+		
 		this.panel.setSize(1280, 1024);
-		this.panel.add(label);
+		this.panel.add(this.label);
+		//就餐按钮
 		this.jLabel_jc = new JLabel("就 餐");
 		this.jLabel_jc.setFont(font);
 		this.jLabel_jc.setBounds(103, 630, 215, 86);
 		this.jLabel_jc.addMouseListener(this);
 		this.jLabel_jc.setHorizontalAlignment(JLabel.CENTER);
+		//取外卖按钮
+		this.jLabel_wm = new JLabel("外 卖");
+		this.jLabel_wm.setFont(font);
+		this.jLabel_wm.setBounds(453, 630, 215, 86);
+		this.jLabel_wm.addMouseListener(this);
+		this.jLabel_wm.setHorizontalAlignment(JLabel.CENTER);
 		
 		this.panel2.setLayout(null);
 		this.panel2.add(jLabel_jc);
+		this.panel2.add(this.jLabel_wm);
 		this.panel2.setSize(1280, 1024);
 		this.panel2.setLocation(0, 0);
 		this.panel2.setOpaque(false);
@@ -88,7 +99,6 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 		
 		this.jtxPsd.setBounds(185,452,510,90);
 		this.jtxPsd.setFont(new Font("Arabic", Font.BOLD, 60));
-		this.jtxPsd.addFocusListener(this);
 		this.jtxPsd.addMouseListener(this);
 		this.jtxPsd.setEditable(false);
 		this.panel2.add(this.jtxPsd);
@@ -101,28 +111,15 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 		this.panel2.add(this.userJList);
 
 		
-		layeredPane.add(panel,1);
-		layeredPane.add(panel2,0);
+		this.layeredPane.add(this.panel,1);
+		this.layeredPane.add(this.panel2,0);
 		frame.add(layeredPane);
-	//	frame.pack();
 		frame.setVisible(true);
 	}
-	@Override
-	public void focusGained(FocusEvent e) {
-		// TODO Auto-generated method stub
-		createDialPanel();
-		}
-	@Override
-	public void focusLost(FocusEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-	
+	//创建拨号盘
 	public void createDialPanel(){
 		this.panel2.remove(userJList);
 		this.dialPanel.setBounds(768, 300, 360, 480);
-		
-		
 		
 		this.num1.setLocation(0, 0);
 		this.num2.setLocation(120, 0);
@@ -167,45 +164,56 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 		if(e.getComponent().equals(this.jtxPsd)){
 			createDialPanel();
 		}
+		if(e.getComponent().equals(this.jLabel_jc)){
+			new jcFrame();
+			this.frame.dispose();
+		}
+		if(e.getComponent().equals(this.jLabel_wm)){
+			new wmFrame();
+			this.frame.dispose();
+		}
+		
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getComponent().equals(num1)){
-			this.setPressedButtonStyle(this.num1);
+			this.setPressedButtonStyle(this.num1,e);
 		}
 		if(e.getComponent().equals(num2)){
-			this.setPressedButtonStyle(this.num2);
+			this.setPressedButtonStyle(this.num2,e);
 		}
 		if(e.getComponent().equals(num3)){
-			this.setPressedButtonStyle(this.num3);
+			this.setPressedButtonStyle(this.num3,e);
 		}
 		if(e.getComponent().equals(num4)){
-			this.setPressedButtonStyle(this.num4);
+			this.setPressedButtonStyle(this.num4,e);
 		}
 		if(e.getComponent().equals(num5)){
-			this.setPressedButtonStyle(this.num5);
+			this.setPressedButtonStyle(this.num5,e);
 		}
 		if(e.getComponent().equals(num6)){
-			this.setPressedButtonStyle(this.num6);
+			this.setPressedButtonStyle(this.num6,e);
 		}
 		if(e.getComponent().equals(num7)){
-			this.setPressedButtonStyle(this.num7);
+			this.setPressedButtonStyle(this.num7,e);
 		}
 		if(e.getComponent().equals(num8)){
-			this.setPressedButtonStyle(this.num8);
+			this.setPressedButtonStyle(this.num8,e);
 		}
 		if(e.getComponent().equals(num9)){
-			this.setPressedButtonStyle(this.num9);
+			this.setPressedButtonStyle(this.num9,e);
 		}
 		if(e.getComponent().equals(num0)){
-			this.setPressedButtonStyle(this.num0);
+			this.setPressedButtonStyle(this.num0,e);
 		}
 		if(e.getComponent().equals(numx)){
-			this.setPressedButtonStyle(this.numx);
+			this.setPressedButtonStyle(this.numx,e);
 		}
 		if(e.getComponent().equals(numj)){
 			this.setPressedButtonStyle(this.numj);
+			this.psd = this.psd.substring(0, this.psd.length()-1);
+			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(this.userJlabel)){
 			this.panel2.remove(dialPanel);
@@ -221,66 +229,43 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 		// TODO Auto-generated method stub
 		if(e.getComponent().equals(num1)){
 			this.setReleasedButtonStyle(this.num1);
-			this.psd = this.psd+"1";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num2)){
 			this.setReleasedButtonStyle(this.num2);
-			this.psd = this.psd+"2";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num3)){
 			this.setReleasedButtonStyle(this.num3);
-			this.psd = this.psd+"3";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num4)){
 			this.setReleasedButtonStyle(this.num4);
-			this.psd = this.psd+"4";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num5)){
 			this.setReleasedButtonStyle(this.num5);
-			this.psd = this.psd+"5";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num6)){
 			this.setReleasedButtonStyle(this.num6);
-			this.psd = this.psd+"6";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num7)){
 			this.setReleasedButtonStyle(this.num7);
-			this.psd = this.psd+"7";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num8)){
 			this.setReleasedButtonStyle(this.num8);
-			this.psd = this.psd+"8";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(num9)){
 			this.setReleasedButtonStyle(this.num9);
 		}
 		if(e.getComponent().equals(num0)){
 			this.setReleasedButtonStyle(this.num0);
-			this.psd = this.psd+"0";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(numx)){
 			this.setReleasedButtonStyle(this.numx);
-			this.psd = this.psd+"*";
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(numj)){
 			this.setReleasedButtonStyle(this.numj);
-			this.psd = this.psd.substring(0, this.psd.length()-1);
-			this.jtxPsd.setText(this.psd);
 		}
 		if(e.getComponent().equals(this.jLabel_jc)){
 			this.jLabel_jc.setForeground(Color.black);
 			this.jLabel_jc.setOpaque(false);
-			System.out.println(this.jtxPsd.getText());
 		}
 	}
 	@Override
@@ -292,6 +277,13 @@ public class LoginFrame extends JFrame implements FocusListener,MouseListener,Li
 	public void mouseExited(MouseEvent e) {
 		// TODO Auto-generated method stub
 		
+	}
+	public void setPressedButtonStyle(JLabel num,MouseEvent event){
+		num.setForeground(Color.DARK_GRAY);
+		num.setOpaque(true);
+		num.setBackground(Color.yellow);
+		this.psd = this.psd+((JLabel)event.getComponent()).getText();
+		this.jtxPsd.setText(this.psd);
 	}
 	public void setPressedButtonStyle(JLabel num){
 		num.setForeground(Color.DARK_GRAY);
