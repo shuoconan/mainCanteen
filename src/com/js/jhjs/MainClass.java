@@ -1,6 +1,9 @@
 package com.js.jhjs;
 
 import java.awt.EventQueue;
+import java.util.Set;
+
+import gnu.io.CommPortIdentifier;
 
 public class MainClass {
 
@@ -9,12 +12,14 @@ public class MainClass {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					LoginFrame frame = new LoginFrame();
+					new LoginFrame();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		});
+		
+
 	}
 
 }

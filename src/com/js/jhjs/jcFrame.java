@@ -3,8 +3,8 @@ package com.js.jhjs;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -13,7 +13,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-public class jcFrame{
+public class jcFrame implements MouseListener{
 	private JFrame jcFrames;
 	private JPanel jcPanel = new JPanel();
 	private JPanel jcPanel2 = new JPanel();
@@ -25,12 +25,12 @@ public class jcFrame{
 	private JLabel timeEcho;
 	private JLabel logLabel;
 	private JLabel mealsKind;
+	private JLabel settingBackJLabel;
 	private JLayeredPane jcLayeredPane = new JLayeredPane();
 	
 
 	public jcFrame() {
 		this.initJcFrame("img/3.jpg");
-		new settingFrame();
 	}
 	public void initJcFrame(String pathName){
 		//初始化frame
@@ -73,10 +73,14 @@ public class jcFrame{
 		this.mealsKind.setFont(new Font("黑体",Font.BOLD,30));
 		//时间显示
 		this.timeEcho = new JLabel();
-		this.timeEcho.setBounds(684, 147, 600, 50);
+		this.timeEcho.setBounds(34, 22, 600, 50);
 		this.timeEcho.setFont(new Font("黑体",Font.BOLD,30));
-		this.timeEcho.setForeground(Color.black);
+		this.timeEcho.setForeground(Color.white);
 		this.addTimeLabel();
+		//设置按钮
+		this.settingBackJLabel = new JLabel();
+		this.settingBackJLabel.setBounds(1094, 12, 100, 80);
+		this.settingBackJLabel.addMouseListener(this);
 		
 		this.jcPanel2.setLayout(null);
 		this.jcPanel2.add(this.userImg);
@@ -86,6 +90,7 @@ public class jcFrame{
 		this.jcPanel2.add(this.timeEcho);
 		this.jcPanel2.add(this.logLabel);
 		this.jcPanel2.add(this.mealsKind);
+		this.jcPanel2.add(this.settingBackJLabel);
 		this.jcPanel2.setBounds(0, 0, 1280, 1024);
 		this.jcPanel2.setOpaque(false);
 		
@@ -144,6 +149,33 @@ public class jcFrame{
 			}
 		});
 		threadTime.start();	
+	}
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		// TODO Auto-generated method stub
+		if (e.getComponent().equals(this.settingBackJLabel)) {
+			new settingFrame(this.jcFrames);
+		}
+	}
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

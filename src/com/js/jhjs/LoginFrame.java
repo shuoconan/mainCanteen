@@ -1,15 +1,11 @@
 package com.js.jhjs;
-import com.js.jhjs.img.*;
+
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
-import java.awt.LayoutManager;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -18,8 +14,6 @@ import javax.swing.JLayeredPane;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -58,6 +52,8 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	public void initLoginFrame(String bgPathname){
 		//frame初始设置
 		this.jtxPsd.setText("");
+		this.jtxPsd.setOpaque(false);
+		this.jtxPsd.setBorder(BorderFactory.createEmptyBorder());
 		this.frame = new JFrame("金尚美食");
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.frame.setBounds(0,0,1280,1024);
@@ -80,6 +76,19 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.jLabel_wm.setBounds(453, 630, 215, 86);
 		this.jLabel_wm.addMouseListener(this);
 		this.jLabel_wm.setHorizontalAlignment(JLabel.CENTER);
+		//为九宫格数字添加监听器
+		this.num0.addMouseListener(this);
+		this.num1.addMouseListener(this);
+		this.num2.addMouseListener(this);
+		this.num3.addMouseListener(this);
+		this.num4.addMouseListener(this);
+		this.num5.addMouseListener(this);
+		this.num6.addMouseListener(this);
+		this.num7.addMouseListener(this);
+		this.num8.addMouseListener(this);
+		this.num9.addMouseListener(this);
+		this.numx.addMouseListener(this);
+		this.numj.addMouseListener(this);
 		
 		this.panel2.setLayout(null);
 		this.panel2.add(jLabel_jc);
@@ -105,8 +114,10 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		
 		this.userJList = new JList<String>(new String[]{"顾阳","颜壮"});
 		this.userJList.setFont(new Font("黑体", Font.BOLD, 40));
-		this.userJList.setBounds(768, 300, 400, 480);
-		this.userJList.setOpaque(false);
+		this.userJList.setBounds(768, 318, 400, 480);
+		this.userJList.setBorder(BorderFactory.createLineBorder(new Color(181,218,236)));
+		this.userJList.setOpaque(true);
+		this.userJList.setBackground(new Color(181,218,236));
 		this.userJList.addListSelectionListener(this);
 		this.panel2.add(this.userJList);
 
@@ -119,7 +130,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	//创建拨号盘
 	public void createDialPanel(){
 		this.panel2.remove(userJList);
-		this.dialPanel.setBounds(768, 300, 360, 480);
+		this.dialPanel.setBounds(768, 318, 360, 480);
 		
 		this.num1.setLocation(0, 0);
 		this.num2.setLocation(120, 0);
@@ -155,7 +166,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		num.setSize(120, 120);
 		num.setFont(this.font);
 		num.setForeground(Color.white);
-		num.addMouseListener(this);
+		num.setBorder(BorderFactory.createLineBorder(Color.getColor("#B5DAEC")));
 		this.dialPanel.add(num);
 	}
 	@Override
@@ -281,7 +292,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	public void setPressedButtonStyle(JLabel num,MouseEvent event){
 		num.setForeground(Color.DARK_GRAY);
 		num.setOpaque(true);
-		num.setBackground(Color.yellow);
+		num.setBackground(new Color(181,218,236));
 		this.psd = this.psd+((JLabel)event.getComponent()).getText();
 		this.jtxPsd.setText(this.psd);
 	}
