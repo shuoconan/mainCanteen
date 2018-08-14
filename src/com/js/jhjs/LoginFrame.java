@@ -12,10 +12,13 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class LoginFrame implements MouseListener,ListSelectionListener{
     private JFrame frame = null;
@@ -44,6 +47,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
     private JLabel num0 = new JLabel("0",JLabel.CENTER);
     private JLabel numj = new JLabel("DEL",JLabel.CENTER);
     private String psd = "";
+    private DatabaseManipulate dbm = new DatabaseManipulate();
     
     
 	public LoginFrame() {
@@ -97,8 +101,6 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.panel2.setLocation(0, 0);
 		this.panel2.setOpaque(false);
 		
-		this.userlist.add("顾阳");
-		this.userlist.add("颜壮");
 		this.userJlabel = new JLabel();
 		this.userJlabel.setFont(font);	
 		this.userJlabel.setBounds(185, 316, 510, 90);
@@ -112,7 +114,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.jtxPsd.setEditable(false);
 		this.panel2.add(this.jtxPsd);
 		
-		this.userJList = new JList<String>(new String[]{"顾阳","颜壮"});
+		this.userJList = new JList<String>(this.dbm.searchUsers());
 		this.userJList.setFont(new Font("黑体", Font.BOLD, 40));
 		this.userJList.setBounds(768, 318, 400, 480);
 		this.userJList.setBorder(BorderFactory.createLineBorder(new Color(181,218,236)));
@@ -172,18 +174,46 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
+		String string = new String(this.jtxPsd.getPassword());
 		if(e.getComponent().equals(this.jtxPsd)){
 			createDialPanel();
 		}
 		if(e.getComponent().equals(this.jLabel_jc)){
-			new jcFrame();
-			this.frame.dispose();
+			if(!this.userJlabel.getText().equals("")){
+				if(!string.equals("")){
+					if(this.checkUsers(this.userJlabel.getText(), string)){
+						new jcFrame();
+						this.frame.dispose();
+					}else {
+						JOptionPane.showMessageDialog(null,"请输入正确密码！" ,"密码错误" , JOptionPane.ERROR_MESSAGE);
+						this.psd = "";
+						this.jtxPsd.setText("");
+					}
+				}else {
+					JOptionPane.showMessageDialog(null,"密码不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+				}
+			}else {
+				JOptionPane.showMessageDialog(null,"用户名不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		if(e.getComponent().equals(this.jLabel_wm)){
-			new wmFrame();
-			this.frame.dispose();
+			if(!this.userJlabel.getText().equals("")){
+				if(!string.equals("")){
+					if(this.checkUsers(this.userJlabel.getText(), string)){
+						new wmFrame();
+						this.frame.dispose();
+					}else {
+						JOptionPane.showMessageDialog(null,"请输入正确密码！" ,"密码错误" , JOptionPane.ERROR_MESSAGE);
+						this.jtxPsd.setText("");
+						this.psd = "";
+					}
+				}else {
+					JOptionPane.showMessageDialog(null,"密码不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+				}
+			}else {
+				JOptionPane.showMessageDialog(null,"用户名不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+			}
 		}
-		
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {
@@ -310,6 +340,18 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	public void valueChanged(ListSelectionEvent e) {
 		// TODO Auto-generated method stub
 		this.userJlabel.setText(this.userJList.getSelectedValue());
+	}
+	public boolean checkUsers(String username,String userpsd){
+		md5Duty m5d = new md5Duty();
+		String userpassword = this.dbm.queryStringUser(username);
+		if(userpassword.equals(m5d.toMd5(userpsd))){
+			return true;
+		}else {
+			return false;
+		}
+	}
+	public String[] searchUserFromDB(){
+		return this.dbm.searchUsers();
 	}
 
 }

@@ -18,8 +18,11 @@ public class MainClass {
 				}
 			}
 		});
-		
-
+//	md5Duty md5duty = new md5Duty();
+//	System.out.println(md5duty.toMd5("123456"));
+//	System.out.println(md5duty.toMd5("123456"));
+//	System.out.println(md5duty.toMd5("123456"));
+//
 	}
 
 }
