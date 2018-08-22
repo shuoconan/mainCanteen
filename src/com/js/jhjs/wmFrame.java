@@ -28,10 +28,12 @@ public class wmFrame implements MouseListener{
 	private JLabel mealsKind;
 	private JLabel settingBackJLabel;
 	private JLayeredPane jcLayeredPane = new JLayeredPane();
+	private String strUser;
 	
 
-	public wmFrame() {
+	public wmFrame(String str) {
 		this.initJcFrame("img/4.jpg");
+		this.strUser = str;
 	}
 	public void initJcFrame(String pathName){
 		//≥ı ºªØframe
@@ -146,7 +148,7 @@ public class wmFrame implements MouseListener{
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if (e.getComponent().equals(this.settingBackJLabel)) {
-			new settingFrame(this.jcFrames);
+			new settingFrame(this.jcFrames,this.strUser);
 		}
 	}
 	@Override

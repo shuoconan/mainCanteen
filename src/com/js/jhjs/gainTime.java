@@ -12,10 +12,18 @@ import java.util.Date;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 public class gainTime {
 	private String WebUrl = "http://api.k780.com:88/?app=life.time&appkey=10003&sign=b59bc3ef6191eb9f747dd4e83c99f2a4&format=json";
 	
+	public static String gainDate(){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		String str1 = sdf.format(new Date());
+		StringBuffer sBuffer = new StringBuffer(str1);
+		str1 = new String(sBuffer)+new String(sBuffer.reverse());
+		return str1;
+	}
 	public String gainDateAndTime(){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(new Date());
@@ -52,8 +60,6 @@ public class gainTime {
                 JsonObject jsonTime = (JsonObject) jParser.parse(result);
                 JsonObject resultGetTime = jsonTime.get("result").getAsJsonObject();
                 result = resultGetTime.get("datetime_1").getAsString();
-                System.out.println(result);
-                System.out.println(resultGetTime.get("datetime_1").getAsString());
                 
             }
 		} catch (Exception e) {

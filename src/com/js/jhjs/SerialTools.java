@@ -1,12 +1,17 @@
 package com.js.jhjs;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringBufferInputStream;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TooManyListenersException;
+
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import gnu.io.CommPortIdentifier;
 import gnu.io.PortInUseException;
@@ -14,6 +19,7 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
+import jdk.internal.util.xml.impl.ReaderUTF8;
 
 public class SerialTools implements Runnable, SerialPortEventListener {
 	
@@ -22,6 +28,7 @@ public class SerialTools implements Runnable, SerialPortEventListener {
 	final static String appName="MyApp";
 	private  InputStream is;
 	private  OutputStream os;
+	private BufferedReader br;
 	private  SerialPort serialPort;
 	byte[] readBuffer=new byte[100];
 	
@@ -99,6 +106,7 @@ public class SerialTools implements Runnable, SerialPortEventListener {
 	}
 	@Override
 	public void serialEvent(SerialPortEvent event) {
+		int k = 0;
 		/*
 		 * 此处省略一下事件，可酌情添加
 		 *  SerialPortEvent.BI:/*Break interrupt,通讯中断
@@ -115,9 +123,11 @@ public class SerialTools implements Runnable, SerialPortEventListener {
 			/*Data available at the serial port，端口有可用数据。读到缓冲数组，输出到终端*/
 			try {
 				while(is.available()>0){
-					is.read(readBuffer);//收到的数据再此，可视情况处理
+				// is.read(readBuffer);//收到的数据再此，可视情况处理
+					br = new BufferedReader(new ReaderUTF8(is));
+					String str = br.readLine();
+					dealDuty.dealDuties(str);
 				}
-				System.out.println(new String(readBuffer));
 			} catch (IOException e) {
 			}
 		}

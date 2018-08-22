@@ -182,7 +182,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 			if(!this.userJlabel.getText().equals("")){
 				if(!string.equals("")){
 					if(this.checkUsers(this.userJlabel.getText(), string)){
-						new jcFrame();
+						new jcFrame(this.userJlabel.getText());
 						this.frame.dispose();
 					}else {
 						JOptionPane.showMessageDialog(null,"ÇëÊäÈëÕıÈ·ÃÜÂë£¡" ,"ÃÜÂë´íÎó" , JOptionPane.ERROR_MESSAGE);
@@ -200,7 +200,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 			if(!this.userJlabel.getText().equals("")){
 				if(!string.equals("")){
 					if(this.checkUsers(this.userJlabel.getText(), string)){
-						new wmFrame();
+						new wmFrame(this.userJlabel.getText());
 						this.frame.dispose();
 					}else {
 						JOptionPane.showMessageDialog(null,"ÇëÊäÈëÕıÈ·ÃÜÂë£¡" ,"ÃÜÂë´íÎó" , JOptionPane.ERROR_MESSAGE);

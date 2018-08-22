@@ -6,6 +6,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import com.google.gson.JsonObject;
+
 
 /*
  * check username and user password
@@ -35,6 +37,7 @@ public class DatabaseManipulate {
 		}
 		
 	}
+	//给用户名返回用户名密码的加密值
 	public String queryStringUser(String str){
 		String sqlString = "select * from users where username = '"+str+"'";
 		ResultSet rs;
@@ -50,6 +53,7 @@ public class DatabaseManipulate {
 		}
 		return resString;
 	}
+	//返回目前操作系统管理员用户的字符串数组
 	public String[] searchUsers(){
 		String string = "select * from users";
 		String[] str = null;
@@ -70,5 +74,51 @@ public class DatabaseManipulate {
 			e.printStackTrace();
 		}
 		return str;
+	}
+	public JsonObject searchLunchWithIc(String icnum,String num){
+		String string = "select * from charge where icnum = '"+icnum+"'";
+		String string2 = null;
+		String str = null;
+		String str_charge = null;
+		ResultSet rs;
+		try {
+			rs = this.statement.executeQuery(string);
+			while (rs.next()) {
+				str = rs.getString("name"); 
+				str_charge = rs.getString("chargenum");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(str_charge);
+		System.out.println(num);
+		str_charge = String.valueOf(Integer.parseInt(str_charge)-Integer.parseInt(num));
+		string2 = "update charge set chargenum ='"+str_charge+"' where icnum ='"+icnum+"'";
+		try {
+			this.statement.execute(string2);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JsonObject jobject = new JsonObject();
+		jobject.addProperty("name", str);
+		jobject.addProperty("charge", str_charge);
+	    return jobject;		
+	}
+	public String searchPhoneNum(String icNum){
+		String sqlString = "select * from users where phonenum = '"+icNum+"'";
+		ResultSet rs;
+		String resString = null;
+		try {
+			rs = this.statement.executeQuery(sqlString);
+			while (rs.next()) {
+				resString = rs.getString("phonenum");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return resString;
 	}
 }

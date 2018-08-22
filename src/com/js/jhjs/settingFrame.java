@@ -18,19 +18,23 @@ public class settingFrame implements MouseListener{
 	private JLabel loginOut;
 	private JLabel switchFrame;
 	private JLabel checkUpdate;
+	private JLabel serialLabel;
 	private JFrame jf;
+	private String strUser;
 	
-	public settingFrame(){
+	public settingFrame(String string){
 		this.initSettingFrame();
+		this.strUser = string;
 	}
-	public settingFrame(JFrame jfs){
+	public settingFrame(JFrame jfs,String string){
 		this.jf = jfs;
 		this.initSettingFrame();
+		this.strUser = string;
 	}
 	
 	public void initSettingFrame(){
 		this.settingJFrame = new JFrame("设置");
-		this.settingJFrame.setBounds(100, 100, 300, 250);
+		this.settingJFrame.setBounds(100, 100, 300, 400);
 		this.jPanel.setBounds(0, 0, 300, 800);
 		this.jPanel.setLayout(null);
 		this.updatePsd = new JLabel("修改密码");
@@ -49,10 +53,15 @@ public class settingFrame implements MouseListener{
 		this.switchFrame.setBounds(0, 150, 300, 50);
 		this.setButtonLableStyle(this.switchFrame);
 		
+		this.serialLabel = new JLabel("串口设置");
+		this.serialLabel.setBounds(0, 200, 300, 50);
+		this.setButtonLableStyle(this.serialLabel);
+		
 		this.jPanel.add(this.updatePsd);
 		this.jPanel.add(this.checkUpdate);
 		this.jPanel.add(this.loginOut);
 		this.jPanel.add(this.switchFrame);
+		this.jPanel.add(this.serialLabel);
 		
 		this.settingJFrame.add(jPanel);
 		this.settingJFrame.setVisible(true);
@@ -71,12 +80,12 @@ public class settingFrame implements MouseListener{
 		if(e.getComponent().equals(this.switchFrame)){
 			//this.jf.dispose();
 			if (this.jf.getTitle().equals("就餐")) {
-				new wmFrame();
+				new wmFrame(this.strUser);
 				this.jf.dispose();
 				this.settingJFrame.dispose();
 			}
 			if (this.jf.getTitle().equals("外卖")) {
-				new jcFrame();
+				new jcFrame(this.strUser);
 				this.jf.dispose();
 				this.settingJFrame.dispose();
 			}
@@ -106,6 +115,10 @@ public class settingFrame implements MouseListener{
 			this.switchFrame.setBackground(Color.DARK_GRAY);
 			this.switchFrame.setForeground(Color.white);
 		}
+		if(e.getComponent().equals(this.serialLabel)){
+			this.serialLabel.setBackground(Color.DARK_GRAY);
+			this.serialLabel.setForeground(Color.white);
+		}
 	}
 	@Override
 	public void mouseReleased(MouseEvent e) {
@@ -125,6 +138,10 @@ public class settingFrame implements MouseListener{
 		if(e.getComponent().equals(this.switchFrame)){
 			this.switchFrame.setBackground(Color.white);
 			this.switchFrame.setForeground(Color.black);
+		}
+		if(e.getComponent().equals(this.serialLabel)){
+			this.serialLabel.setBackground(Color.white);
+			this.serialLabel.setForeground(Color.black);
 		}
 	}
 	@Override

@@ -1,0 +1,21 @@
+[version]   
+signature="$CHICAGO$"
+AdvancedINF=2.0
+
+[Add.Code]
+rf35.ocx = rf35.ocx
+mwrf32.dll= mwrf32.dll
+
+[mwrf32.dll]
+file-win32-x86=thiscab   
+RegisterServer=yes
+DestDir=11   
+FileVersion=2,1,0,0
+
+
+[rf35.ocx]
+file-win32-x86=thiscab   
+RegisterServer=yes   
+clsid={8C11E03B-3F3E-4457-A5A1-B9ECEC5FDA80}   
+DestDir=11   
+FileVersion=1,0,0,1
