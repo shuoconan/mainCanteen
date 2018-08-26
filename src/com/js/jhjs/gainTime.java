@@ -24,7 +24,7 @@ public class gainTime {
 		str1 = new String(sBuffer)+new String(sBuffer.reverse());
 		return str1;
 	}
-	public String gainDateAndTime(){
+	public static String gainDateAndTime(){
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(new Date());
 	}

@@ -31,6 +31,7 @@ public class SerialTools implements Runnable, SerialPortEventListener {
 	private BufferedReader br;
 	private  SerialPort serialPort;
 	byte[] readBuffer=new byte[100];
+	private String num = null;
 	
 	public Set<CommPortIdentifier> getPortList(){
 		Enumeration tempPortList;  //枚举类
@@ -126,13 +127,18 @@ public class SerialTools implements Runnable, SerialPortEventListener {
 				// is.read(readBuffer);//收到的数据再此，可视情况处理
 					br = new BufferedReader(new ReaderUTF8(is));
 					String str = br.readLine();
-					dealDuty.dealDuties(str);
+					
 				}
 			} catch (IOException e) {
 			}
 		}
 	}
- 
+	public String putNumOut(){
+		return this.num;
+	}
+	public void setNumNull(){
+		this.num = null;
+	}
 	@Override
 	public void run() {
 		try {

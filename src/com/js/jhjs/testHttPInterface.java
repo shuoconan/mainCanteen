@@ -1,48 +1,71 @@
 package com.js.jhjs;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 
 public class testHttPInterface {
-	public static String HttpSendPost(String url,Map<String,String> map){
-		if(map==null){
-			return null;
-		}
-		String resultStr = null;
-		CloseableHttpClient chc = HttpClients.createDefault();
-		ArrayList<NameValuePair> list = new ArrayList<NameValuePair>();
-		for(Map.Entry<String, String> entry:map.entrySet()){
-			list.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
-		}
-		UrlEncodedFormEntity uefe = new UrlEncodedFormEntity(list,Consts.UTF_8);
-		HttpPost hp = new HttpPost("http://text.jinshangfoods.com/api/tags/group");
-		hp.setEntity(uefe);
-		try {
-			CloseableHttpResponse chrp = chc.execute(hp);
-			HttpEntity entity = chrp.getEntity();
-			if (entity != null) {  
-                System.out.println("--------------------------------------");  
-           //     System.out.println("Response content: " + unicodeToCn(EntityUtils.toString(entity, "utf16")));
-                System.out.println("Response content: " + EntityUtils.toString(entity, "utf8"));
-                System.out.println("--------------------------------------");  
-            }  
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return resultStr;
-	}
+	 public static JsonObject doPost(String url,JsonObject json){
+		    HttpClient client = new DefaultHttpClient();
+		    HttpPost post = new HttpPost(url);
+		    JsonObject response = null;
+		    String result = null;
+		    try {
+		      StringEntity s = new StringEntity(json.toString());
+		      s.setContentEncoding("UTF-8");
+		      s.setContentType("application/json");//发送json数据需要设置contentType
+		      post.setEntity(s);
+		      HttpResponse res = client.execute(post);
+		      if(res.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
+		        HttpEntity entity = res.getEntity();
+		        result = unicodeToString(EntityUtils.toString(res.getEntity()));// 返回json格式：
+		      }
+		    } catch (Exception e) {
+		      throw new RuntimeException(e);
+		    }
+		    return str2Json(result);
+		  }
+	 public static String unicodeToString(String str) {
+	        Pattern pattern = Pattern.compile("(\\\\u(\\p{XDigit}{4}))");
+	        Matcher matcher = pattern.matcher(str);
+	        char ch;
+	        while (matcher.find()) {
+	            ch = (char) Integer.parseInt(matcher.group(2), 16);
+	            str = str.replace(matcher.group(1), ch+"" );
+	        }
+	        return str;
+	    }
+	 public static JsonObject str2Json(String string){
+		 JsonParser parser = new JsonParser();
+		 JsonObject jObject = (JsonObject) parser.parse(string);
+		 return jObject;
+	 }
 }

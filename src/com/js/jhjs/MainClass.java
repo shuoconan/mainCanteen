@@ -21,28 +21,33 @@ public class MainClass {
 //		jobject.addProperty("name", "15261760619");
 //		System.out.println(jobject.toString());
 //		System.out.println(Encrypt.encrypt2(jobject.toString(), "2018082112808102"));
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					new jcFrame("lalala");
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					new jcFrame("lalala");
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 //		SerialTools sTools = new SerialTools();
 //		Set<CommPortIdentifier> cpifSet = sTools.getPortList();
 //		for(CommPortIdentifier cpif:cpifSet){
-//				sTools.openSerialPort(cpif, 20);				
+//				sTools.openSerialPort(cpif, 20);	
 //		}
 //	md5Duty md5duty = new md5Duty();
 //	System.out.println(md5duty.toMd5("123456"));
 //	System.out.println(md5duty.toMd5("123456"));
 //	System.out.println(md5duty.toMd5("123456"));
 //
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("contents", Encrypt.encrypt("{\"time\":\"2018-08-22 17:27:22\"}", "2018082222808102"));
-		testHttPInterface.HttpSendPost("123", map);
+//		Map<String, String> map = new HashMap<String, String>();
+//		map.put("contents", Encrypt.encrypt("{\"time\":\"2018-08-22 17:27:22\"}", "2018082222808102"));
+//		JsonObject jo = new JsonObject();
+//		jo.addProperty("contents", Encrypt.encrypt("{\"time\":\"2018-08-24 17:27:22\",\"mobile\":\"13816720691\"}", "2018082442808102"));
+//		System.out.println(jo.toString());
+//		System.out.println(testHttPInterface.doPost("http://text.jinshangfoods.com/api/user/show",jo));
+		//		DatabaseManipulate dm = new DatabaseManipulate();
+//		dm.writeImgIntoDatabase("¹ËÑô", "15195388207", "4A303030303130350", "D:\\123.jpg", "È«Ãñ");
 	}
 
 }
