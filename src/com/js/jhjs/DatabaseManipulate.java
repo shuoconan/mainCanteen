@@ -207,7 +207,7 @@ public class DatabaseManipulate {
 		return strToken;
 	}
 	public void putMoneyUpdate(String money,String mobile){
-		String strUpdate = "update charge set chargenum = ? where mobile = ?";
+		String strUpdate = "update charge set chargenum = ? where phonenum = ?";
 		PreparedStatement ps;
 		try {
 			ps = this.connection.prepareStatement(strUpdate);
@@ -218,6 +218,68 @@ public class DatabaseManipulate {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public String returnNumsByMobile(String mobile,String time){
+		String str = "select * from foods_num where mobile = ?";
+		try {
+			PreparedStatement ps = this.connection.prepareStatement(str);
+			ps.setString(1, mobile);
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()){
+				if(rs.getString("time").equals(time)){
+					return rs.getString("nums");
+				}else{
+					String str2 = "update foods_num set time = ? ,nums = \"0\" where mobile = ?";
+					PreparedStatement ps2 = this.connection.prepareStatement(str2);
+					ps2.setString(1, time);
+					ps2.setString(2, mobile);
+					ps2.execute();
+					return "0";
+				}
+			}else{
+				String str2 = "insert into foods_num(mobile,nums,time) values (?,\"0\",?)";
+				PreparedStatement ps2 = this.connection.prepareStatement(str2);
+				ps2.setString(1, mobile);
+				ps2.setString(2, time);
+				ps2.execute();
+				return "0";
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public void setFoodsNums(String mobile,String time,String nums){
+		String strUpdate = "update foods_num set time = ?,nums = ? where mobile = ?";
+		try {
+			PreparedStatement ps = this.connection.prepareStatement(strUpdate);
+			ps.setString(1, time);
+			ps.setString(2, nums);
+			ps.setString(3, mobile);
+			ps.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
+	public String getBreakfastPrice(String mealsKinds){
+		String strSelect = "select * from meals_price where name = ?";
+		String returnPrice = null;
+		try {
+			PreparedStatement ps = this.connection.prepareStatement(strSelect);
+			ps.setString(1, mealsKinds);
+			ResultSet rs = ps.executeQuery();
+			while(rs.next()){
+				returnPrice = rs.getString("price");
+			}	
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return returnPrice;
 	}
 }
 

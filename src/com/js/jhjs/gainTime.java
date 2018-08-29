@@ -28,6 +28,10 @@ public class gainTime {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		return sdf.format(new Date());
 	}
+	public static String gainFullDate(){
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		return sdf.format(new Date());
+	}
 	public String gainTime(){
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
 		return sdf.format(new Date());

@@ -24,7 +24,7 @@ public class MainClass {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					new jcFrame("lalala");
+					new wmFrame("lalala");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -43,9 +43,9 @@ public class MainClass {
 //		Map<String, String> map = new HashMap<String, String>();
 //		map.put("contents", Encrypt.encrypt("{\"time\":\"2018-08-22 17:27:22\"}", "2018082222808102"));
 //		JsonObject jo = new JsonObject();
-//		jo.addProperty("contents", Encrypt.encrypt("{\"time\":\"2018-08-24 17:27:22\",\"mobile\":\"13816720691\"}", "2018082442808102"));
+//		jo.addProperty("contents", "aL1jjF+fxTVEFyskFkeEkFncngQzNOwa3Sz2+8Ti2pJkSDMrngFzT4W0DGRLCPY8Wt9DawLoim9YRT626tR4Fw==");
 //		System.out.println(jo.toString());
-//		System.out.println(testHttPInterface.doPost("http://text.jinshangfoods.com/api/user/show",jo));
+//		System.out.println(testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/takeout",jo));
 		//		DatabaseManipulate dm = new DatabaseManipulate();
 //		dm.writeImgIntoDatabase("¹ËÑô", "15195388207", "4A303030303130350", "D:\\123.jpg", "È«Ãñ");
 	}
