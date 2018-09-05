@@ -1,53 +1,200 @@
 package com.js.jhjs;
 
-import java.awt.EventQueue;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Set;
-
-import com.google.gson.JsonObject;
-
+import java.util.TooManyListenersException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import gnu.io.CommPortIdentifier;
+import gnu.io.PortInUseException;
+import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
+import gnu.io.UnsupportedCommOperationException;
+import jdk.internal.util.xml.impl.ReaderUTF8;
 
 public class MainClass {
-
+	private jcFrame jcframe = null;
+	private wmFrame wmframe = null;
+	private settingFrame settingframe = null;
+	private LoginFrame lfs = null;
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-//		System.out.println(Encrypt.encrypt("hello", "2018082112808102"));
-//		System.out.print("十六进制密文为：");
-//		System.out.println(Encrypt.encrypt2("zgz15261760619", "2018082112808102"));
-//		dealDuty.dealDuties("2E1DDFC81FF7560234D3002CB9E12A7D");
-//		JsonObject jobject = new JsonObject();
-//		jobject.addProperty("name", "15261760619");
-//		System.out.println(jobject.toString());
-//		System.out.println(Encrypt.encrypt2(jobject.toString(), "2018082112808102"));
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
+		new MainClass();
+	}
+	public MainClass() {
+		// TODO Auto-generated constructor stub
+		this.jcframe = new jcFrame("");
+		this.wmframe = new wmFrame("");
+		this.settingframe = new settingFrame("");
+		this.jcframe.setOtherFrame(this.settingframe);
+		this.wmframe.setOtherFrame(this.settingframe);
+		this.lfs = new LoginFrame(this.jcframe,this.wmframe);
+		this.settingframe.setOtherFrame(this.jcframe, this.wmframe,this.lfs);
+		System.out.println("窗口对象建立完毕");
+		SerialTools sTools = this.new SerialTools();
+		Set<CommPortIdentifier> portList = sTools.getPortList();
+		ExecutorService fixedThreadPool = Executors.newFixedThreadPool(portList.size());
+		for (CommPortIdentifier cpif : portList) {
+			// 处理串口发来数据的线程
+			fixedThreadPool.execute(()->{
+				SerialTools st = this.new SerialTools();
+				st.openSerialPort(cpif, 20);
+			});
+			
+		}
+	}
+	public void setSettingframe(boolean b){
+		this.settingframe.setVisibles(b);
+		
+	}
+	public class SerialTools implements Runnable, SerialPortEventListener {
+
+		private boolean isOpen = false;
+		private Set<CommPortIdentifier> portList = new HashSet<CommPortIdentifier>();
+		final static String appName = "MyApp";
+		private InputStream is;
+		private OutputStream os;
+		private BufferedReader br;
+		private SerialPort serialPort;
+		byte[] readBuffer = new byte[100];
+		protected String num = null;
+		public Set<CommPortIdentifier> getPortList() {
+			Enumeration tempPortList; // 枚举类
+			CommPortIdentifier portIp;
+			tempPortList = CommPortIdentifier.getPortIdentifiers();
+			/*
+			 * 不带参数的getPortIdentifiers方法获得一个枚举对象，
+			 * 该对象又包含了系统中管理每个端口的CommPortIdentifier对象。 注意这里的端口不仅仅是指串口，也包括并口。
+			 * 这个方法还可以带参数。 getPortIdentifiers(CommPort)
+			 * 获得与已经被应用程序打开的端口相对应的CommPortIdentifier对象。 getPortIdentifier(String
+			 * portName)获取指定端口名（比如“COM1”）的CommPortIdentifier对象。
+			 */
+			while (tempPortList.hasMoreElements()) {
+				// 在这里可以调用getPortType方法返回端口类型，串口为CommPortIdentifier.PORT_SERIAL
+				portIp = (CommPortIdentifier) tempPortList.nextElement();
+				portList.add(portIp);
+			}
+			return portList;
+		}
+
+		public boolean openSerialPort(CommPortIdentifier portIp, int delay) {
+			try {
+				serialPort = (SerialPort) portIp.open(appName, delay);
+				/*
+				 * open方法打开通讯端口，获得一个CommPort对象。它使程序独占端口。 如果端口正被其他应用程序占用，将使用
+				 * CommPortOwnershipListener事件机制，传递一个PORT_OWNERSHIP_REQUESTED事件。
+				 * 每个端口都关联一个 InputStream 和一个OutputStream。
+				 * 如果端口是用open方法打开的，那么任何的getInputStream都将返回相同的数据流对象，除非有close 被调用。
+				 * 有两个参数，第一个为应用程序名；第二个参数是在端口打开时阻塞等待的毫秒数。
+				 */
+			} catch (PortInUseException e) {
+				return false;
+			}
+			try {
+				is = serialPort.getInputStream();/* 获取端口的输入流对象 */
+				os = serialPort.getOutputStream();/* 获取端口的输出流对象 */
+			} catch (IOException e) {
+				return false;
+			}
+			try {
+				serialPort.addEventListener(this);/* 注册一个SerialPortEventListener事件来监听串口事件 */
+			} catch (TooManyListenersException e) {
+				return false;
+			}
+			serialPort.notifyOnDataAvailable(true);/* 数据可用 */
+			try {
+				/* 设置串口初始化参数，依次是波特率，数据位，停止位和校验 */
+				serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,SerialPort.PARITY_NONE);
+			} catch (UnsupportedCommOperationException e) {
+				return false;
+			}
+			isOpen = true;
+			return true;
+		}
+		public boolean getOPen(){
+			return isOpen;
+		}
+		public boolean closeSerialPort() {
+			if (isOpen) {
 				try {
-					new wmFrame("lalala");
-				} catch (Exception e) {
-					e.printStackTrace();
+					is.close();
+					os.close();
+					serialPort.notifyOnDataAvailable(false);
+					serialPort.removeEventListener();
+					serialPort.close();
+					isOpen = false;
+				} catch (IOException e) {
+					return false;
 				}
 			}
-		});
-//		SerialTools sTools = new SerialTools();
-//		Set<CommPortIdentifier> cpifSet = sTools.getPortList();
-//		for(CommPortIdentifier cpif:cpifSet){
-//				sTools.openSerialPort(cpif, 20);	
-//		}
-//	md5Duty md5duty = new md5Duty();
-//	System.out.println(md5duty.toMd5("123456"));
-//	System.out.println(md5duty.toMd5("123456"));
-//	System.out.println(md5duty.toMd5("123456"));
-//
-//		Map<String, String> map = new HashMap<String, String>();
-//		map.put("contents", Encrypt.encrypt("{\"time\":\"2018-08-22 17:27:22\"}", "2018082222808102"));
-//		JsonObject jo = new JsonObject();
-//		jo.addProperty("contents", "aL1jjF+fxTVEFyskFkeEkFncngQzNOwa3Sz2+8Ti2pJkSDMrngFzT4W0DGRLCPY8Wt9DawLoim9YRT626tR4Fw==");
-//		System.out.println(jo.toString());
-//		System.out.println(testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/takeout",jo));
-		//		DatabaseManipulate dm = new DatabaseManipulate();
-//		dm.writeImgIntoDatabase("顾阳", "15195388207", "4A303030303130350", "D:\\123.jpg", "全民");
+			return true;
+		}
+
+		public boolean sendMessage(String message) {
+			try {
+				os.write(message.getBytes());
+			} catch (IOException e) {
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public void serialEvent(SerialPortEvent event) {
+			int k = 0;
+			/*
+			 * 此处省略一下事件，可酌情添加 SerialPortEvent.BI:/*Break interrupt,通讯中断
+			 * SerialPortEvent.OE:/*Overrun error，溢位错误
+			 * SerialPortEvent.FE:/*Framing error，传帧错误
+			 * SerialPortEvent.PE:/*Parity error，校验错误
+			 * SerialPortEvent.CD:/*Carrier detect，载波检测
+			 * SerialPortEvent.CTS:/*Clear to send，清除发送
+			 * SerialPortEvent.DSR:/*Data set ready，数据设备就绪
+			 * SerialPortEvent.RI:/*Ring indicator，响铃指示
+			 * SerialPortEvent.OUTPUT_BUFFER_EMPTY:/*Output buffer is
+			 * empty，输出缓冲区清空
+			 */
+			if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+				/* Data available at the serial port，端口有可用数据。读到缓冲数组，输出到终端 */
+				try {
+					while (is.available() > 0) {
+						// is.read(readBuffer);//收到的数据再此，可视情况处理
+						br = new BufferedReader(new ReaderUTF8(is));
+						String str = br.readLine();
+						System.out.println(str);
+						System.out.println(MainClass.this.jcframe.getVisible());
+						if((MainClass.this.jcframe.getVisible())&&(!MainClass.this.wmframe.getVisible())){
+							MainClass.this.jcframe.dealDuties(str);
+						}
+						if((!MainClass.this.jcframe.getVisible())&&(MainClass.this.wmframe.getVisible())){
+							MainClass.this.wmframe.dealDuties(str);
+						}
+
+					}
+				} catch (IOException e) {
+				}
+			}
+		}
+
+		public String putNumOut() {
+			return this.num;
+		}
+
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(50);// 每次收发数据完毕后线程暂停50ms
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
 	}
 
 }

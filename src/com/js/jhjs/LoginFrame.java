@@ -48,11 +48,21 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
     private JLabel numj = new JLabel("DEL",JLabel.CENTER);
     private String psd = "";
     private DatabaseManipulate dbm = new DatabaseManipulate();
+    private jcFrame framsJc = null;
+    private wmFrame framsWM = null;
     
     
+	public LoginFrame(jcFrame frame1,wmFrame frame2) {
+		this.framsJc = frame1;
+		this.framsWM = frame2;
+		this.initLoginFrame("img/1.jpg");
+	}
 	public LoginFrame() {
 		this.initLoginFrame("img/1.jpg");
 	}
+	 public void setVisible(boolean b){
+		 this.frame.setVisible(b);
+	 }
 	public void initLoginFrame(String bgPathname){
 		//frame≥ı º…Ë÷√
 		this.jtxPsd.setText("");
@@ -182,8 +192,8 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 			if(!this.userJlabel.getText().equals("")){
 				if(!string.equals("")){
 					if(this.checkUsers(this.userJlabel.getText(), string)){
-						new jcFrame(this.userJlabel.getText());
-						this.frame.dispose();
+						this.framsJc.setVisible(true,this.userJlabel.getText());
+						this.frame.setVisible(false);
 					}else {
 						JOptionPane.showMessageDialog(null,"«Î ‰»Î’˝»∑√‹¬Î£°" ,"√‹¬Î¥ÌŒÛ" , JOptionPane.ERROR_MESSAGE);
 						this.psd = "";
@@ -200,8 +210,8 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 			if(!this.userJlabel.getText().equals("")){
 				if(!string.equals("")){
 					if(this.checkUsers(this.userJlabel.getText(), string)){
-						new wmFrame(this.userJlabel.getText());
-						this.frame.dispose();
+						this.framsWM.setVisible(true,this.userJlabel.getText());
+						this.frame.setVisible(false);
 					}else {
 						JOptionPane.showMessageDialog(null,"«Î ‰»Î’˝»∑√‹¬Î£°" ,"√‹¬Î¥ÌŒÛ" , JOptionPane.ERROR_MESSAGE);
 						this.jtxPsd.setText("");

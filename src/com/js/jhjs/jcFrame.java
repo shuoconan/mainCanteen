@@ -14,10 +14,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.channels.NonWritableChannelException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TooManyListenersException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -67,13 +70,28 @@ public class jcFrame implements MouseListener {
 	private DatabaseManipulate dbm_charge = new DatabaseManipulate();
 	private DatabaseManipulate dm = new DatabaseManipulate();
 	private InfiniteProgressPanel glasspane = new InfiniteProgressPanel();
+	private SerialTools st = null;
+	private settingFrame sf = null;
 
 	public jcFrame(String str) {
 		this.strUser = str;
 		this.initJcFrame("img/3.jpg");
-
 	}
-
+	public void setUser(String str){
+		this.strUser = str;
+	}
+	
+	public boolean getVisible(){
+		return this.jcFrames.isVisible();
+	}
+	public void setVisible(boolean status,String strname){
+		this.jcFrames.setVisible(status);
+		this.strUser = strname;
+		this.userEcho.setText("当前操作员:" + this.strUser);
+	}
+	public void setOtherFrame(settingFrame sf){
+		this.sf = sf;
+	}
 	public void initJcFrame(String pathName) {
 		// 初始化frame
 		this.jcFrames = new JFrame("就餐");
@@ -123,7 +141,7 @@ public class jcFrame implements MouseListener {
 		this.userEcho.setBounds(500, 22, 500, 50);
 		this.userEcho.setFont(new Font("黑体", Font.BOLD, 30));
 		this.userEcho.setForeground(Color.white);
-		this.userEcho.setText("当前操作员:" + this.strUser);
+		//this.userEcho.setText("当前操作员:" + this.strUser);
 		// 消费金额显示
 		this.comsuptionLabel = new JLabel();
 		this.comsuptionLabel.setBounds(731, 746, 400, 100);
@@ -179,7 +197,6 @@ public class jcFrame implements MouseListener {
 		this.jcLayeredPane.add(this.jcPanel2, 0);
 
 		this.jcFrames.add(this.jcLayeredPane);
-		this.jcFrames.setVisible(true);
 		// 启动线程进行对时操作
 		Thread thread = new Thread(new Runnable() {
 			@Override
@@ -214,15 +231,6 @@ public class jcFrame implements MouseListener {
 				}
 			}
 		});
-		jcFrame.SerialTools sTools = this.new SerialTools();
-		Set<CommPortIdentifier> portgetList = sTools.getPortList();
-		for (CommPortIdentifier cpif : portgetList) {
-			// 处理串口发来数据的线程
-			new Thread(() -> {
-				sTools.openSerialPort(cpif, 20);
-			}).start();
-		}
-
 		thread.start();
 		thread_jc.start();
 	}
@@ -263,8 +271,8 @@ public class jcFrame implements MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if (e.getComponent().equals(this.settingBackJLabel)) {
-			new settingFrame(this.jcFrames, this.strUser);
+		if(e.getSource().equals(this.settingBackJLabel)){
+			this.sf.setVisibles(true);
 		}
 	}
 
@@ -292,143 +300,6 @@ public class jcFrame implements MouseListener {
 
 	}
 
-	public class SerialTools implements Runnable, SerialPortEventListener {
-
-		private boolean isOpen = false;
-		private Set<CommPortIdentifier> portList = new HashSet<CommPortIdentifier>();
-		final static String appName = "MyApp";
-		private InputStream is;
-		private OutputStream os;
-		private BufferedReader br;
-		private SerialPort serialPort;
-		byte[] readBuffer = new byte[100];
-		protected String num = null;
-
-		public Set<CommPortIdentifier> getPortList() {
-			Enumeration tempPortList; // 枚举类
-			CommPortIdentifier portIp;
-			tempPortList = CommPortIdentifier.getPortIdentifiers();
-			/*
-			 * 不带参数的getPortIdentifiers方法获得一个枚举对象，
-			 * 该对象又包含了系统中管理每个端口的CommPortIdentifier对象。 注意这里的端口不仅仅是指串口，也包括并口。
-			 * 这个方法还可以带参数。 getPortIdentifiers(CommPort)
-			 * 获得与已经被应用程序打开的端口相对应的CommPortIdentifier对象。 getPortIdentifier(String
-			 * portName)获取指定端口名（比如“COM1”）的CommPortIdentifier对象。
-			 */
-			while (tempPortList.hasMoreElements()) {
-				// 在这里可以调用getPortType方法返回端口类型，串口为CommPortIdentifier.PORT_SERIAL
-				portIp = (CommPortIdentifier) tempPortList.nextElement();
-				portList.add(portIp);
-			}
-			return portList;
-		}
-
-		public boolean openSerialPort(CommPortIdentifier portIp, int delay) {
-			try {
-				serialPort = (SerialPort) portIp.open(appName, delay);
-				/*
-				 * open方法打开通讯端口，获得一个CommPort对象。它使程序独占端口。 如果端口正被其他应用程序占用，将使用
-				 * CommPortOwnershipListener事件机制，传递一个PORT_OWNERSHIP_REQUESTED事件。
-				 * 每个端口都关联一个 InputStream 和一个OutputStream。
-				 * 如果端口是用open方法打开的，那么任何的getInputStream都将返回相同的数据流对象，除非有close 被调用。
-				 * 有两个参数，第一个为应用程序名；第二个参数是在端口打开时阻塞等待的毫秒数。
-				 */
-			} catch (PortInUseException e) {
-				return false;
-			}
-			try {
-				is = serialPort.getInputStream();/* 获取端口的输入流对象 */
-				os = serialPort.getOutputStream();/* 获取端口的输出流对象 */
-			} catch (IOException e) {
-				return false;
-			}
-			try {
-				serialPort.addEventListener(this);/* 注册一个SerialPortEventListener事件来监听串口事件 */
-			} catch (TooManyListenersException e) {
-				return false;
-			}
-			serialPort.notifyOnDataAvailable(true);/* 数据可用 */
-			try {
-				/* 设置串口初始化参数，依次是波特率，数据位，停止位和校验 */
-				serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
-						SerialPort.PARITY_NONE);
-			} catch (UnsupportedCommOperationException e) {
-				return false;
-			}
-			return true;
-		}
-
-		public boolean closeSerialPort() {
-			if (isOpen) {
-				try {
-					is.close();
-					os.close();
-					serialPort.notifyOnDataAvailable(false);
-					serialPort.removeEventListener();
-					serialPort.close();
-					isOpen = false;
-				} catch (IOException e) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-		public boolean sendMessage(String message) {
-			try {
-				os.write(message.getBytes());
-			} catch (IOException e) {
-				return false;
-			}
-			return true;
-		}
-
-		@Override
-		public void serialEvent(SerialPortEvent event) {
-			int k = 0;
-			/*
-			 * 此处省略一下事件，可酌情添加 SerialPortEvent.BI:/*Break interrupt,通讯中断
-			 * SerialPortEvent.OE:/*Overrun error，溢位错误
-			 * SerialPortEvent.FE:/*Framing error，传帧错误
-			 * SerialPortEvent.PE:/*Parity error，校验错误
-			 * SerialPortEvent.CD:/*Carrier detect，载波检测
-			 * SerialPortEvent.CTS:/*Clear to send，清除发送
-			 * SerialPortEvent.DSR:/*Data set ready，数据设备就绪
-			 * SerialPortEvent.RI:/*Ring indicator，响铃指示
-			 * SerialPortEvent.OUTPUT_BUFFER_EMPTY:/*Output buffer is
-			 * empty，输出缓冲区清空
-			 */
-			if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-				/* Data available at the serial port，端口有可用数据。读到缓冲数组，输出到终端 */
-				try {
-					while (is.available() > 0) {
-						// is.read(readBuffer);//收到的数据再此，可视情况处理
-						br = new BufferedReader(new ReaderUTF8(is));
-						String str = br.readLine();
-						System.out.println(str);
-						jcFrame.this.dealDuties(str);
-
-					}
-				} catch (IOException e) {
-				}
-			}
-		}
-
-		public String putNumOut() {
-			return this.num;
-		}
-
-		@Override
-		public void run() {
-			try {
-				Thread.sleep(50);// 每次收发数据完毕后线程暂停50ms
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-
-	}
-
 	public void dealDuties(String string) {
 		String str1;
 		String str2;
@@ -448,7 +319,7 @@ public class jcFrame implements MouseListener {
 			jsonObject = new JsonObject();
 			jsonObject.addProperty("contents", str2);
 			// 第一次HTTP请求，获取用户信息
-			jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/user/show", jsonObject);
+			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jsonObject);
 			System.out.println(jsonObject.toString());
 			jsonObject = (JsonObject) jsonObject.get("data");
 			// 将token存入数据库中
@@ -462,7 +333,7 @@ public class jcFrame implements MouseListener {
 			jsonObject2 = new JsonObject();
 			jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
 			// 第二次HTTP请求，获取用户订餐信息.
-			jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/meal", jsonObject2);
+			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/meal", jsonObject2);
 			System.out.println(jsonObject.toString());
 			//如果存在订单信息
 			if (jsonObject.get("code").getAsString().equals("0")) {
@@ -487,7 +358,7 @@ public class jcFrame implements MouseListener {
 				jsonObject.addProperty("order_id", orderId);
 				jsonObject2 = new JsonObject();
 				jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
-				jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/payment", jsonObject2);
+				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jsonObject2);
 				System.out.println(jsonObject.toString());
 				if (jsonObject.get("code").getAsString().equals("0")) {
 					jsonObject = (JsonObject) jsonObject.get("data");
@@ -510,7 +381,7 @@ public class jcFrame implements MouseListener {
 				jsonObject.addProperty("type", mealsType());
 				jsonObject2 = new JsonObject();
 				jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
-				jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/site/payment", jsonObject2);
+				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/site/payment", jsonObject2);
 				System.out.println(jsonObject.toString());
 				if (jsonObject.get("code").getAsString().equals("0")) {
 					jsonObject = (JsonObject) jsonObject.get("data");

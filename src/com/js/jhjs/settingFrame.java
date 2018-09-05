@@ -10,6 +10,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+
 public class settingFrame implements MouseListener{
 
 	private JFrame settingJFrame;
@@ -21,17 +22,20 @@ public class settingFrame implements MouseListener{
 	private JLabel serialLabel;
 	private JFrame jf;
 	private String strUser;
+	private jcFrame jfs;
+	private wmFrame wmfs;
+	private LoginFrame lfs;
 	
 	public settingFrame(String string){
 		this.initSettingFrame();
 		this.strUser = string;
 	}
-	public settingFrame(JFrame jfs,String string){
-		this.jf = jfs;
-		this.initSettingFrame();
-		this.strUser = string;
+
+	public void setOtherFrame(jcFrame jfs,wmFrame wmfs,LoginFrame lfs){
+		this.lfs = lfs;
+		this.jfs = jfs;
+		this.wmfs = wmfs;
 	}
-	
 	public void initSettingFrame(){
 		this.settingJFrame = new JFrame("…Ë÷√");
 		this.settingJFrame.setBounds(100, 100, 300, 400);
@@ -64,7 +68,6 @@ public class settingFrame implements MouseListener{
 		this.jPanel.add(this.serialLabel);
 		
 		this.settingJFrame.add(jPanel);
-		this.settingJFrame.setVisible(true);
 	}
 	public void setButtonLableStyle(JLabel label){
 		label.setBackground(Color.white);
@@ -74,26 +77,27 @@ public class settingFrame implements MouseListener{
 		label.setOpaque(true);
 		label.addMouseListener(this);
 	}
+	public void setVisibles(boolean b){
+		this.settingJFrame.setVisible(b);
+	}
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getComponent().equals(this.switchFrame)){
 			//this.jf.dispose();
-			if (this.jf.getTitle().equals("æÕ≤Õ")) {
-				new wmFrame(this.strUser);
-				this.jf.dispose();
-				this.settingJFrame.dispose();
+			if (this.jfs.getVisible()) {
+				this.wmfs.setVisible(true, this.strUser);
+				this.jfs.setVisible(false, this.strUser);
+			}else {
+				this.wmfs.setVisible(true, this.strUser);
+				this.jfs.setVisible(true, this.strUser);
 			}
-			if (this.jf.getTitle().equals("Õ‚¬Ù")) {
-				new jcFrame(this.strUser);
-				this.jf.dispose();
-				this.settingJFrame.dispose();
-			}
+			
 		}
 		if(e.getComponent().equals(this.loginOut)){
-			new LoginFrame();
-			this.jf.dispose();
-			this.settingJFrame.dispose();
+			this.wmfs.setVisible(false, this.strUser);
+			this.jfs.setVisible(false, this.strUser);
+			this.lfs.setVisible(true);
 		}
 	}
 	@Override
