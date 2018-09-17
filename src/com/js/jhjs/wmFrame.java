@@ -86,6 +86,7 @@ public class wmFrame implements MouseListener {
 	private Set<CommPortIdentifier> portList = null;
 	private ArrayList<SerialTools> cpifList = new ArrayList<SerialTools>();
 	private settingFrame sf = null;
+	private ArrayList<String> listQueue = new ArrayList<String>();
 
 
 	public wmFrame(String str) {
@@ -121,25 +122,28 @@ public class wmFrame implements MouseListener {
 		this.jcPanel.add(this.bgImage);
 		this.jcPanel.setBounds(0, 0, 1280, 1024);
 		// 用户头像设置
-		this.userImg = new JLabel("这里要放用户照片哦");
+		this.userImg = new JLabel("");
 		this.userImg.setBounds(198, 189, 280, 367);
-		this.userImg.setBackground(Color.GRAY);
-		this.userImg.setOpaque(true);
+//		this.userImg.setBackground(Color.GRAY);
+//		this.userImg.setOpaque(true);
 		// 用户名显示
-		this.userName = new JLabel("这里是用户名");
+		this.userName = new JLabel("");
 		this.userName.setBounds(251, 651, 222, 50);
-		this.userName.setBackground(Color.GRAY);
-		this.userName.setOpaque(true);
+		this.userName.setFont(new Font("黑体", Font.BOLD, 30));
+//		this.userName.setBackground(Color.GRAY);
+//		this.userName.setOpaque(true);
 		// 用户ID显示
-		this.userId = new JLabel("这里是用户ID");
+		this.userId = new JLabel("");
 		this.userId.setBounds(251, 731, 222, 50);
-		this.userId.setBackground(Color.GRAY);
-		this.userId.setOpaque(true);
+		this.userId.setFont(new Font("黑体", Font.BOLD, 30));
+//		this.userId.setBackground(Color.GRAY);
+//		this.userId.setOpaque(true);
 		// 用户余额显示
-		this.userChange = new JLabel("这里是用户余额显示");
+		this.userChange = new JLabel("");
 		this.userChange.setBounds(251, 811, 222, 50);
-		this.userChange.setBackground(Color.GRAY);
-		this.userChange.setOpaque(true);
+		this.userChange.setFont(new Font("黑体", Font.BOLD, 30));
+//		this.userChange.setBackground(Color.GRAY);
+//		this.userChange.setOpaque(true);
 		// 早中晚餐显示
 		this.mealsKind = new JLabel("外卖");
 		this.mealsKind.setBounds(1050, 147, 200, 50);
@@ -169,7 +173,7 @@ public class wmFrame implements MouseListener {
 		this.payMoney.setForeground(Color.white);
 		this.payMoney.setHorizontalAlignment(JLabel.CENTER);
 		this.payMoney.addMouseListener(this);
-		
+		//称重界面显示
 		this.weighLabel = new JLabel("这是称重界面");
 		this.weighLabel.setBounds(200, 400, 880, 228);
 		this.weighLabel.setVisible(false);
@@ -179,23 +183,18 @@ public class wmFrame implements MouseListener {
 		this.logsLabel.setBounds(200, 400, 880, 228);
 		this.logsLabel.setVisible(false);
 		this.logsLabel.setBackground(Color.white);
-//		this.weighLabel.setOpaque(true);
 		//合计金额显示
-		this.totalLabel = new JLabel("这是合计金额界面");
+		this.totalLabel = new JLabel("");
 		this.totalLabel.setBounds(883, 648, 262, 60);
-		this.totalLabel.setBackground(Color.GRAY);
-		this.totalLabel.setOpaque(true);
+		this.totalLabel.setFont(new Font("黑体", Font.BOLD, 30));
 		//待支付金额显示
 		this.toPayLabel = new JLabel("这是待支付金额界面");
 		this.toPayLabel.setBounds(883, 726, 262, 60);
-		this.toPayLabel.setBackground(Color.GRAY);
-		this.toPayLabel.setOpaque(true);
+		this.toPayLabel.setFont(new Font("黑体", Font.BOLD, 30));
 		//支付金额显示
 		this.payLabel = new JLabel("这是支付金额界面");
 		this.payLabel.setBounds(883, 807, 262, 60);
-		this.payLabel.setBackground(Color.GRAY);
-		this.payLabel.setOpaque(true);
-		
+		this.payLabel.setFont(new Font("黑体", Font.BOLD, 30));		
 		this.jcPanel2.setLayout(null);
 		
 		this.jcPanel2.add(this.userImg);
@@ -277,6 +276,9 @@ public class wmFrame implements MouseListener {
 		});
 		threadTime.start();
 	}
+	public void addArrayList(String str){
+		this.listQueue.add(str);
+	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
@@ -317,7 +319,7 @@ public class wmFrame implements MouseListener {
 			jObject.addProperty("mobile", this.userId.getText());
 			jObject2.addProperty("contents", Encrypt.encrypt(jObject.toString(), gainTime.gainDate()));
 			// 第一次HTTP请求，获取用户信息
-			jObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/user/show", jObject2);
+			jObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jObject2);
 			jObject = (JsonObject) jObject.get("data");
 			// 将token存入数据库中
 			dm.saveToken(jObject.get("mobile").getAsString(), jObject.get("remember_token").getAsString(),
@@ -332,7 +334,7 @@ public class wmFrame implements MouseListener {
 			System.out.println(toolsClass.yuanToDouble(this.toPayLabel.getText()));
 			jObject.addProperty("price",String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText().replaceAll("元", ""))-Integer.parseInt(this.amount)));
 			jObject2.addProperty("contents", Encrypt.encrypt(jObject.toString(), gainTime.gainDate()));
-			jObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/payment", jObject2);
+			jObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jObject2);
 			System.out.println(jObject.toString());
 			if(jObject.get("code").getAsString().equals("0")){
 				jObject = (JsonObject) jObject.get("data");
@@ -406,7 +408,7 @@ public class wmFrame implements MouseListener {
 			jsonObject = new JsonObject();
 			jsonObject.addProperty("contents", str2);
 			// 第一次HTTP请求，获取用户信息
-			jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/user/show", jsonObject);
+			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jsonObject);
 			System.out.println(jsonObject.toString());
 			jsonObject = (JsonObject) jsonObject.get("data");
 			// 将token存入数据库中
@@ -420,7 +422,7 @@ public class wmFrame implements MouseListener {
 			str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
 			jsonObject = new JsonObject();
 			jsonObject.addProperty("contents", str2);
-			jsonObject = testHttPInterface.doPost("http://text.jinshangfoods.com/api/order/takeout", jsonObject);
+			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/takeout", jsonObject);
 			System.out.println(jsonObject.toString());
 			if(jsonObject.get("code").getAsString().equals("0")){
 				Vector<String> columnNames = new Vector<String>();

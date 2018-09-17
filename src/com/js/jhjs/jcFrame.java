@@ -72,6 +72,8 @@ public class jcFrame implements MouseListener {
 	private InfiniteProgressPanel glasspane = new InfiniteProgressPanel();
 	private SerialTools st = null;
 	private settingFrame sf = null;
+	private boolean flags = true;
+	private Thread threads = null;
 
 	public jcFrame(String str) {
 		this.strUser = str;
@@ -395,6 +397,12 @@ public class jcFrame implements MouseListener {
 			Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
 			imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
 			glasspane.stop();
+			if(this.threads != null){
+				if(this.threads.isAlive()){
+					this.threads.interrupt();
+				}
+			}
+			
 			//统一界面显示
 			this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
 			this.userChange.setText(remains);
@@ -402,43 +410,47 @@ public class jcFrame implements MouseListener {
 			this.userName.setText(dm.getName());
 			this.userId.setText(dm.getMobile());
 			// 3秒后界面恢复
-			new Thread(() -> {
+			this.threads = new Thread(() -> {
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(2000);
 					jcFrame.this.userImg.setIcon(null);
 					jcFrame.this.userName.setText("");
 					jcFrame.this.userId.setText("");
 					jcFrame.this.comsuptionLabel.setText("");
 					jcFrame.this.userChange.setText("");
-					jcFrame.this.num1.setOpaque(false);
-					jcFrame.this.num1.setForeground(Color.black);
-					jcFrame.this.num2.setOpaque(false);
-					jcFrame.this.num2.setForeground(Color.black);
-					jcFrame.this.num3.setOpaque(false);
-					jcFrame.this.num3.setForeground(Color.black);
-					jcFrame.this.num4.setOpaque(false);
-					jcFrame.this.num4.setForeground(Color.black);
-					jcFrame.this.num5.setOpaque(false);
-					jcFrame.this.num5.setForeground(Color.black);
-					jcFrame.this.num6.setOpaque(false);
-					jcFrame.this.num6.setForeground(Color.black);
-					jcFrame.this.num7.setOpaque(false);
-					jcFrame.this.num7.setForeground(Color.black);
-					jcFrame.this.num8.setOpaque(false);
-					jcFrame.this.num8.setForeground(Color.black);
-					jcFrame.this.num9.setOpaque(false);
-					jcFrame.this.num9.setForeground(Color.black);
+					setNumback();
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			}).start();
+			});
+			this.threads.start();
 
 		}
 		if (string.length() == 17) {
 
 		}
 		System.gc();
+	}
+	public void setNumback(){
+		jcFrame.this.num1.setOpaque(false);
+		jcFrame.this.num1.setForeground(Color.black);
+		jcFrame.this.num2.setOpaque(false);
+		jcFrame.this.num2.setForeground(Color.black);
+		jcFrame.this.num3.setOpaque(false);
+		jcFrame.this.num3.setForeground(Color.black);
+		jcFrame.this.num4.setOpaque(false);
+		jcFrame.this.num4.setForeground(Color.black);
+		jcFrame.this.num5.setOpaque(false);
+		jcFrame.this.num5.setForeground(Color.black);
+		jcFrame.this.num6.setOpaque(false);
+		jcFrame.this.num6.setForeground(Color.black);
+		jcFrame.this.num7.setOpaque(false);
+		jcFrame.this.num7.setForeground(Color.black);
+		jcFrame.this.num8.setOpaque(false);
+		jcFrame.this.num8.setForeground(Color.black);
+		jcFrame.this.num9.setOpaque(false);
+		jcFrame.this.num9.setForeground(Color.black);
 	}
 
 	public String setNumsTime() {
@@ -457,46 +469,55 @@ public class jcFrame implements MouseListener {
 
 	public void setNumLabelBackground(String str) {
 		if (str.equals("1")) {
+			this.setNumback();
 			this.num1.setOpaque(true);
 			this.num1.setBackground(Color.DARK_GRAY);
 			this.num1.setForeground(Color.white);
 		}
 		if (str.equals("2")) {
+			this.setNumback();
 			this.num2.setOpaque(true);
 			this.num2.setBackground(Color.DARK_GRAY);
 			this.num2.setForeground(Color.white);
 		}
 		if (str.equals("3")) {
+			this.setNumback();
 			this.num3.setOpaque(true);
 			this.num3.setBackground(Color.DARK_GRAY);
 			this.num3.setForeground(Color.white);
 		}
 		if (str.equals("4")) {
+			this.setNumback();
 			this.num4.setOpaque(true);
 			this.num4.setBackground(Color.DARK_GRAY);
 			this.num4.setForeground(Color.white);
 		}
 		if (str.equals("5")) {
+			this.setNumback();
 			this.num5.setOpaque(true);
 			this.num5.setBackground(Color.DARK_GRAY);
 			this.num5.setForeground(Color.white);
 		}
 		if (str.equals("6")) {
+			this.setNumback();
 			this.num6.setOpaque(true);
 			this.num6.setBackground(Color.DARK_GRAY);
 			this.num6.setForeground(Color.white);
 		}
 		if (str.equals("7")) {
+			this.setNumback();
 			this.num7.setOpaque(true);
 			this.num7.setBackground(Color.DARK_GRAY);
 			this.num7.setForeground(Color.white);
 		}
 		if (str.equals("8")) {
+			this.setNumback();
 			this.num8.setOpaque(true);
 			this.num8.setBackground(Color.DARK_GRAY);
 			this.num8.setForeground(Color.white);
 		}
 		if (str.equals("9")) {
+			this.setNumback();
 			this.num9.setOpaque(true);
 			this.num9.setBackground(Color.DARK_GRAY);
 			this.num9.setForeground(Color.white);
@@ -550,23 +571,23 @@ public class jcFrame implements MouseListener {
 			this.num9.setForeground(Color.white);
 		}
 	}
-
+	//从数据库获取当餐价格并计算
 	public String gainComsuption(String strnum) {
 		String returnComsuption = null;
 		if (this.mealsKind.getText().equals("早餐")) {
-			if (Integer.parseInt(strnum) > 0) {
+			if (Integer.parseInt(strnum) > 1) {
 				returnComsuption = String.valueOf(Integer.parseInt(dm.getBreakfastPrice("breakfast")) * 2);
 			} else {
 				returnComsuption = dm.getBreakfastPrice("breakfast");
 			}
 		} else if (this.mealsKind.getText().equals("午餐")) {
-			if (Integer.parseInt(strnum) > 0) {
+			if (Integer.parseInt(strnum) > 1) {
 				returnComsuption = String.valueOf(Integer.parseInt(dm.getBreakfastPrice("lunch")) * 2);
 			} else {
 				returnComsuption = dm.getBreakfastPrice("lunch");
 			}
 		} else if (this.mealsKind.getText().equals("晚餐")) {
-			if (Integer.parseInt(strnum) > 0) {
+			if (Integer.parseInt(strnum) > 1) {
 				returnComsuption = String.valueOf(Integer.parseInt(dm.getBreakfastPrice("dinner")) * 2);
 			} else {
 				returnComsuption = dm.getBreakfastPrice("dinner");

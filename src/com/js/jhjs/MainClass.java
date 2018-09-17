@@ -68,15 +68,8 @@ public class MainClass {
 			Enumeration tempPortList; // 枚举类
 			CommPortIdentifier portIp;
 			tempPortList = CommPortIdentifier.getPortIdentifiers();
-			/*
-			 * 不带参数的getPortIdentifiers方法获得一个枚举对象，
-			 * 该对象又包含了系统中管理每个端口的CommPortIdentifier对象。 注意这里的端口不仅仅是指串口，也包括并口。
-			 * 这个方法还可以带参数。 getPortIdentifiers(CommPort)
-			 * 获得与已经被应用程序打开的端口相对应的CommPortIdentifier对象。 getPortIdentifier(String
-			 * portName)获取指定端口名（比如“COM1”）的CommPortIdentifier对象。
-			 */
 			while (tempPortList.hasMoreElements()) {
-				// 在这里可以调用getPortType方法返回端口类型，串口为CommPortIdentifier.PORT_SERIAL
+
 				portIp = (CommPortIdentifier) tempPortList.nextElement();
 				portList.add(portIp);
 			}
@@ -86,13 +79,6 @@ public class MainClass {
 		public boolean openSerialPort(CommPortIdentifier portIp, int delay) {
 			try {
 				serialPort = (SerialPort) portIp.open(appName, delay);
-				/*
-				 * open方法打开通讯端口，获得一个CommPort对象。它使程序独占端口。 如果端口正被其他应用程序占用，将使用
-				 * CommPortOwnershipListener事件机制，传递一个PORT_OWNERSHIP_REQUESTED事件。
-				 * 每个端口都关联一个 InputStream 和一个OutputStream。
-				 * 如果端口是用open方法打开的，那么任何的getInputStream都将返回相同的数据流对象，除非有close 被调用。
-				 * 有两个参数，第一个为应用程序名；第二个参数是在端口打开时阻塞等待的毫秒数。
-				 */
 			} catch (PortInUseException e) {
 				return false;
 			}
@@ -148,29 +134,15 @@ public class MainClass {
 		@Override
 		public void serialEvent(SerialPortEvent event) {
 			int k = 0;
-			/*
-			 * 此处省略一下事件，可酌情添加 SerialPortEvent.BI:/*Break interrupt,通讯中断
-			 * SerialPortEvent.OE:/*Overrun error，溢位错误
-			 * SerialPortEvent.FE:/*Framing error，传帧错误
-			 * SerialPortEvent.PE:/*Parity error，校验错误
-			 * SerialPortEvent.CD:/*Carrier detect，载波检测
-			 * SerialPortEvent.CTS:/*Clear to send，清除发送
-			 * SerialPortEvent.DSR:/*Data set ready，数据设备就绪
-			 * SerialPortEvent.RI:/*Ring indicator，响铃指示
-			 * SerialPortEvent.OUTPUT_BUFFER_EMPTY:/*Output buffer is
-			 * empty，输出缓冲区清空
-			 */
 			if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-				/* Data available at the serial port，端口有可用数据。读到缓冲数组，输出到终端 */
 				try {
 					while (is.available() > 0) {
-						// is.read(readBuffer);//收到的数据再此，可视情况处理
 						br = new BufferedReader(new ReaderUTF8(is));
 						String str = br.readLine();
 						System.out.println(str);
 						System.out.println(MainClass.this.jcframe.getVisible());
 						if((MainClass.this.jcframe.getVisible())&&(!MainClass.this.wmframe.getVisible())){
-							MainClass.this.jcframe.dealDuties(str);
+								MainClass.this.jcframe.dealDuties(str);
 						}
 						if((!MainClass.this.jcframe.getVisible())&&(MainClass.this.wmframe.getVisible())){
 							MainClass.this.wmframe.dealDuties(str);
@@ -189,7 +161,7 @@ public class MainClass {
 		@Override
 		public void run() {
 			try {
-				Thread.sleep(50);// 每次收发数据完毕后线程暂停50ms
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

@@ -55,6 +55,22 @@ public class DatabaseManipulate {
 		}
 		return resString;
 	}
+	//返回目前操作员角色
+	public String queryStringRole(String str){
+		String sqlString = "select * from users where username = '"+str+"'";
+		ResultSet rs;
+		String resString = null;
+		try {
+			rs = this.statement.executeQuery(sqlString);
+			while (rs.next()) {
+				resString = rs.getString("roles");
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return resString;
+	}
 	//返回目前操作系统管理员用户的字符串数组
 	public String[] searchUsers(){
 		String string = "select * from users";
