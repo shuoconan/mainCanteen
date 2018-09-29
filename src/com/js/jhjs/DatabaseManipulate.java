@@ -16,7 +16,7 @@ public class DatabaseManipulate {
 	private String driver = "com.mysql.jdbc.Driver";
 	private String url = "jdbc:mysql://localhost:3306/canteen";
 	private String user = "root";
-	private String password = "bonjava";
+	private String password = "";
 	private Statement statement;
 	private byte[] bytes= null;
 	private String name = null;
@@ -96,7 +96,7 @@ public class DatabaseManipulate {
 	
 	
 	public String searchWithNum(String icNum){
-		String sqlString = "select * from users where phonenum = '"+icNum+"'";
+		String sqlString = "select * from charge where icnum = '"+icNum+"'";
 		ResultSet rs;
 		String resString = null;
 		try {
@@ -109,6 +109,45 @@ public class DatabaseManipulate {
 			e.printStackTrace();
 		}
 		return resString;
+	}
+	public boolean searchWithSuperNum(String icNum){
+		String sqlString = "select * from superuser where superId = '"+icNum+"'";
+		boolean b = false;
+		ResultSet rs;
+		String resString = null;
+		try {
+			rs = this.statement.executeQuery(sqlString);
+			if(rs == null){
+				b = false;
+			}else{
+				b = true;
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return b;
+	}
+	public String searchWithNameGetIcNum(String icNum){
+		String sqlString = "select * from charge where icnum = '"+icNum+"'";
+		ResultSet rs;
+		String resString = null;
+		try {
+			rs = this.statement.executeQuery(sqlString);
+				while (rs.next()) {
+					resString = rs.getString("name");
+				}	
+			
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if (resString == null) {
+			return "查无此人";
+		}else {
+			return resString;
+		}
+		
 	}
 	//将用户个人信息保存至数据库保存至数据库
 	public void writeImgIntoDatabase(String name,String phonenum,String icNum,String pathStr,String department){

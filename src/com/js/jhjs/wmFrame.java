@@ -53,7 +53,6 @@ import jdk.internal.util.xml.impl.ReaderUTF8;
 public class wmFrame implements MouseListener {
 
 	private JFrame wmFrames;
-	private SerialTools st = null;
 	private JPanel jcPanel = new JPanel();
 	private JPanel jcPanel2 = new JPanel();
 	private JLabel bgImage;
@@ -75,31 +74,30 @@ public class wmFrame implements MouseListener {
 	private String orderId;
 	private String amount;
 	private JLayeredPane jcLayeredPane = new JLayeredPane();
-	private String strUser;
+	private String strUser = "";
 	private JScrollPane jp = null;
-	private DatabaseManipulate dbm_charge = new DatabaseManipulate();
 	private DatabaseManipulate dm = new DatabaseManipulate();
 	private InfiniteProgressPanel glasspane = new InfiniteProgressPanel();
 	private Vector<Vector<String>> vectorLabel = new Vector<Vector<String>>();
 	private JTable table = new JTable();
 	private ArrayList<String> list = new ArrayList<String>();
-	private Set<CommPortIdentifier> portList = null;
-	private ArrayList<SerialTools> cpifList = new ArrayList<SerialTools>();
 	private settingFrame sf = null;
 	private ArrayList<String> listQueue = new ArrayList<String>();
-
 
 	public wmFrame(String str) {
 		this.initwmFrame("img/4.jpg");
 		this.strUser = str;
 	}
-	public void setOtherFrame(settingFrame sf){
+
+	public void setOtherFrame(settingFrame sf) {
 		this.sf = sf;
 	}
-	public boolean getVisible(){
+
+	public boolean getVisible() {
 		return this.wmFrames.isVisible();
 	}
-	public void setVisible(boolean status,String str){
+
+	public void setVisible(boolean status, String str) {
 		this.strUser = str;
 		this.wmFrames.setVisible(status);
 	}
@@ -124,26 +122,18 @@ public class wmFrame implements MouseListener {
 		// 用户头像设置
 		this.userImg = new JLabel("");
 		this.userImg.setBounds(198, 189, 280, 367);
-//		this.userImg.setBackground(Color.GRAY);
-//		this.userImg.setOpaque(true);
 		// 用户名显示
 		this.userName = new JLabel("");
 		this.userName.setBounds(251, 651, 222, 50);
 		this.userName.setFont(new Font("黑体", Font.BOLD, 30));
-//		this.userName.setBackground(Color.GRAY);
-//		this.userName.setOpaque(true);
 		// 用户ID显示
 		this.userId = new JLabel("");
 		this.userId.setBounds(251, 731, 222, 50);
 		this.userId.setFont(new Font("黑体", Font.BOLD, 30));
-//		this.userId.setBackground(Color.GRAY);
-//		this.userId.setOpaque(true);
 		// 用户余额显示
 		this.userChange = new JLabel("");
 		this.userChange.setBounds(251, 811, 222, 50);
 		this.userChange.setFont(new Font("黑体", Font.BOLD, 30));
-//		this.userChange.setBackground(Color.GRAY);
-//		this.userChange.setOpaque(true);
 		// 早中晚餐显示
 		this.mealsKind = new JLabel("外卖");
 		this.mealsKind.setBounds(1050, 147, 200, 50);
@@ -153,50 +143,51 @@ public class wmFrame implements MouseListener {
 		this.timeEcho.setBounds(34, 22, 600, 50);
 		this.timeEcho.setFont(new Font("黑体", Font.BOLD, 30));
 		this.timeEcho.setForeground(Color.white);
-//		this.timeEcho.setOpaque(true);
 		this.addTimeLabel();
 		// 设置按钮
 		this.settingBackJLabel = new JLabel();
 		this.settingBackJLabel.setBounds(1094, 12, 100, 80);
 		this.settingBackJLabel.addMouseListener(this);
-		//称重完成后的确定按钮
+		// 称重完成后的确定按钮
 		this.okTocalcu = new JLabel("确定");
 		this.okTocalcu.setBounds(806, 889, 177, 68);
-		this.okTocalcu.setFont(new Font("黑体",Font.BOLD,40));
+		this.okTocalcu.setFont(new Font("黑体", Font.BOLD, 40));
 		this.okTocalcu.setForeground(Color.white);
 		this.okTocalcu.setHorizontalAlignment(JLabel.CENTER);
 		this.okTocalcu.addMouseListener(this);
-		//支付按钮
+		// 支付按钮
 		this.payMoney = new JLabel("支付");
 		this.payMoney.setBounds(1020, 889, 177, 68);
-		this.payMoney.setFont(new Font("黑体",Font.BOLD,40));
+		this.payMoney.setFont(new Font("黑体", Font.BOLD, 40));
 		this.payMoney.setForeground(Color.white);
 		this.payMoney.setHorizontalAlignment(JLabel.CENTER);
 		this.payMoney.addMouseListener(this);
-		//称重界面显示
+		// 称重界面显示
 		this.weighLabel = new JLabel("这是称重界面");
 		this.weighLabel.setBounds(200, 400, 880, 228);
 		this.weighLabel.setVisible(false);
 		this.weighLabel.setBackground(Color.white);
-		
+
 		this.logsLabel = new JLabel();
 		this.logsLabel.setBounds(200, 400, 880, 228);
 		this.logsLabel.setVisible(false);
 		this.logsLabel.setBackground(Color.white);
-		//合计金额显示
+		// 合计金额显示
 		this.totalLabel = new JLabel("");
 		this.totalLabel.setBounds(883, 648, 262, 60);
 		this.totalLabel.setFont(new Font("黑体", Font.BOLD, 30));
-		//待支付金额显示
+		// 待支付金额显示
 		this.toPayLabel = new JLabel("这是待支付金额界面");
 		this.toPayLabel.setBounds(883, 726, 262, 60);
 		this.toPayLabel.setFont(new Font("黑体", Font.BOLD, 30));
-		//支付金额显示
+		// 支付金额显示
 		this.payLabel = new JLabel("这是支付金额界面");
 		this.payLabel.setBounds(883, 807, 262, 60);
-		this.payLabel.setFont(new Font("黑体", Font.BOLD, 30));		
+		this.payLabel.setFont(new Font("黑体", Font.BOLD, 30));
+
+		// 特权用户设置
+		this.userId.addMouseListener(this);
 		this.jcPanel2.setLayout(null);
-		
 		this.jcPanel2.add(this.userImg);
 		this.jcPanel2.add(this.userName);
 		this.jcPanel2.add(this.userId);
@@ -240,22 +231,7 @@ public class wmFrame implements MouseListener {
 				gtt.setSystemTime(gtt.gainWebTime());
 			}
 		});
-		// 启动线程进行饭卡监听
-		Thread thread_wm = new Thread(() -> {
-			String mealValue = null;
-			cardDuty cDuty = new cardDuty();
-			// 监听饭卡刷卡形式的循环
-			while (true) {
-				String icNums = cDuty.openICcardPort();
-				if (!icNums.equals("ERROR")) {
-					// wmFrame.this.dealDuties(wmFrame.this.dm.searchWithNum(icNums));
-				}
-			}
-		});
-		
-
 		thread.start();
-		thread_wm.start();
 	}
 
 	public void addTimeLabel() {
@@ -276,43 +252,46 @@ public class wmFrame implements MouseListener {
 		});
 		threadTime.start();
 	}
-	public void addArrayList(String str){
+
+	public void addArrayList(String str) {
 		this.listQueue.add(str);
 	}
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
-		if(e.getSource().equals(this.settingBackJLabel)){
-			this.sf.setVisibles(true);
+		if (e.getSource().equals(this.settingBackJLabel)) {
+			this.sf.setVisibles(true,this.strUser);
 		}
-		if(e.getComponent().equals(this.table)){
-			if(this.table.getValueAt(this.table.getSelectedRow(), 3).equals("称重")){
-				this.weighLabel.setText("请放上"+this.table.getValueAt(this.table.getSelectedRow(), 0));
+		if (e.getComponent().equals(this.table)) {
+			if (this.table.getValueAt(this.table.getSelectedRow(), 3).equals("称重")) {
+				this.weighLabel.setText("请放上" + this.table.getValueAt(this.table.getSelectedRow(), 0));
 				this.weighLabel.setVisible(true);
 				this.weighLabel.setOpaque(true);
 				this.weighLabel.setHorizontalAlignment(JLabel.CENTER);
-				this.weighLabel.setFont(new Font("黑体",Font.BOLD,40));
-				this.jcLayeredPane.add(this.weighLabel,JLayeredPane.MODAL_LAYER);
+				this.weighLabel.setFont(new Font("黑体", Font.BOLD, 40));
+				this.jcLayeredPane.add(this.weighLabel, JLayeredPane.MODAL_LAYER);
 			}
 		}
-		if(e.getComponent().equals(this.okTocalcu)){
-			if(this.list.size()==0){
+		if (e.getComponent().equals(this.okTocalcu)) {
+			if (this.list.size() == 0) {
 				int totals = 0;
 				String cacluString;
 				DefaultTableModel dtm = (DefaultTableModel) this.table.getModel();
-				for(int i=0;i<this.table.getRowCount();i++){
+				for (int i = 0; i < this.table.getRowCount(); i++) {
 					cacluString = (String) dtm.getValueAt(i, 3);
 					System.out.println(cacluString);
-					totals = totals+toolsClass.yuanToDouble(cacluString);
+					totals = totals + toolsClass.yuanToDouble(cacluString);
 				}
 				this.totalLabel.setText(toolsClass.coinToYuan(String.valueOf(totals)));
-				this.payLabel.setText(toolsClass.coinToYuan(String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText())-toolsClass.yuanToDouble(this.toPayLabel.getText()))));
-			}else{
-				
+				this.payLabel
+						.setText(toolsClass.coinToYuan(String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText())
+								- toolsClass.yuanToDouble(this.toPayLabel.getText()))));
+			} else {
+
 			}
 		}
-		if(e.getComponent().equals(this.payMoney)){
+		if (e.getComponent().equals(this.payMoney)) {
 			JsonObject jObject = new JsonObject();
 			JsonObject jObject2 = new JsonObject();
 			jObject.addProperty("time", gainTime.gainDateAndTime());
@@ -320,47 +299,65 @@ public class wmFrame implements MouseListener {
 			jObject2.addProperty("contents", Encrypt.encrypt(jObject.toString(), gainTime.gainDate()));
 			// 第一次HTTP请求，获取用户信息
 			jObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jObject2);
-			jObject = (JsonObject) jObject.get("data");
-			// 将token存入数据库中
-			dm.saveToken(jObject.get("mobile").getAsString(), jObject.get("remember_token").getAsString(),
-					gainTime.gainDateAndTime());
-			jObject = new JsonObject();
-			jObject2 = new JsonObject();
-			jObject.addProperty("time", gainTime.gainDateAndTime());
-			jObject.addProperty("mobile",this.userId.getText());
-			jObject.addProperty("token", dm.fenchToken(this.userId.getText()));
-			jObject.addProperty("order_id",this.orderId);
-			System.out.println(Integer.parseInt(this.amount));
-			System.out.println(toolsClass.yuanToDouble(this.toPayLabel.getText()));
-			jObject.addProperty("price",String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText().replaceAll("元", ""))-Integer.parseInt(this.amount)));
-			jObject2.addProperty("contents", Encrypt.encrypt(jObject.toString(), gainTime.gainDate()));
-			jObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jObject2);
-			System.out.println(jObject.toString());
 			if(jObject.get("code").getAsString().equals("0")){
 				jObject = (JsonObject) jObject.get("data");
-				this.userChange.setText(toolsClass.coinToYuan(jObject.get("money").getAsString()));
-				JOptionPane.showMessageDialog(null, "支付成功", "支付成功", JOptionPane.YES_OPTION);
-			}else {
-				JOptionPane.showMessageDialog(null, "支付失败", "支付失败", JOptionPane.ERROR_MESSAGE);
-			}
-			new Thread(()->{
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+				// 将token存入数据库中
+				dm.saveToken(jObject.get("mobile").getAsString(), jObject.get("remember_token").getAsString(),
+						gainTime.gainDateAndTime());
+				jObject = new JsonObject();
+				jObject2 = new JsonObject();
+				jObject.addProperty("time", gainTime.gainDateAndTime());
+				jObject.addProperty("mobile", this.userId.getText());
+				jObject.addProperty("token", dm.fenchToken(this.userId.getText()));
+				jObject.addProperty("order_id", this.orderId);
+				jObject.addProperty("price",
+						String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText().replaceAll("元", ""))
+								- Integer.parseInt(this.amount)));
+				jObject2.addProperty("contents", Encrypt.encrypt(jObject.toString(), gainTime.gainDate()));
+				jObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jObject2);
+				System.out.println(jObject.toString());
+				if (jObject.get("code").getAsString().equals("0")) {
+					jObject = (JsonObject) jObject.get("data");
+					this.userChange.setText(toolsClass.coinToYuan(jObject.get("money").getAsString()));
+					JOptionPane.showMessageDialog(null, "支付成功", "支付成功", JOptionPane.YES_OPTION);
+				} else {
+					JOptionPane.showMessageDialog(null, "支付失败", "支付失败", JOptionPane.ERROR_MESSAGE);
 				}
-				this.userImg.setIcon(null);
-				this.userName.setText("");
-				this.userId.setText("");
-				this.userChange.setText("");
-				this.totalLabel.setText("");
-				this.toPayLabel.setText("");
-				this.payLabel.setText("");
-				DefaultTableModel dtm = (DefaultTableModel) wmFrame.this.table.getModel();
-				dtm.setRowCount(0);
-				this.table.setModel(dtm);
-			}).start();
+				new Thread(() -> {
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+					this.userImg.setIcon(null);
+					this.userName.setText("");
+					this.userId.setText("");
+					this.userChange.setText("");
+					this.totalLabel.setText("");
+					this.toPayLabel.setText("");
+					this.payLabel.setText("");
+					DefaultTableModel dtm = (DefaultTableModel) wmFrame.this.table.getModel();
+					dtm.setRowCount(0);
+					this.table.setModel(dtm);
+				}).start();
+			}else {
+				JOptionPane.showMessageDialog(null, "获取用户信息失败", "失败", JOptionPane.ERROR_MESSAGE);
+			}
+			
+		}
+		if (e.getComponent().equals(this.userId)) {
+			if (this.strUser.equals("superuser")) {
+				String strNum = JOptionPane.showInputDialog(this.wmFrames, "请输入手机号码", "");
+				if (strNum.length() == 11) {
+					dutiesDo(strNum);
+				} else {
+					JOptionPane.showMessageDialog(null, "手机号输入有误", "失败", JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "当前非特权用户", "失败", JOptionPane.ERROR_MESSAGE);
+			}
+
 		}
 	}
 
@@ -388,99 +385,23 @@ public class wmFrame implements MouseListener {
 
 	}
 
-	
-
-	public void dealDuties(String string) {
-		String str1;
-		String str2;
-		String strComsuption = null;
-		String remains = null;
-		JsonObject jsonObject = null;
-		JsonObject jsonObject2 = null;
-		ImageIcon imagIcon = null;
-		if (string.length() == 24) {
-			glasspane.start();
-			jsonObject = new JsonObject();
-			str1 = Encrypt.decrypt2(string, gainTime.gainDate()).substring(3);
-			jsonObject.addProperty("time", gainTime.gainDateAndTime());
-			jsonObject.addProperty("mobile", str1);
-			str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
-			jsonObject = new JsonObject();
-			jsonObject.addProperty("contents", str2);
-			// 第一次HTTP请求，获取用户信息
-			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jsonObject);
-			System.out.println(jsonObject.toString());
-			jsonObject = (JsonObject) jsonObject.get("data");
-			// 将token存入数据库中
-			dm.saveToken(jsonObject.get("mobile").getAsString(),
-			jsonObject.get("remember_token").getAsString(),gainTime.gainDateAndTime());
-			System.out.println(jsonObject.toString());
-			// 获取订单信息
-			jsonObject = new JsonObject();
-			jsonObject.addProperty("time", gainTime.gainDateAndTime());
-			jsonObject.addProperty("mobile", str1);
-			str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
-			jsonObject = new JsonObject();
-			jsonObject.addProperty("contents", str2);
-			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/takeout", jsonObject);
-			System.out.println(jsonObject.toString());
-			if(jsonObject.get("code").getAsString().equals("0")){
-				Vector<String> columnNames = new Vector<String>();
-				columnNames.add("名称");
-				columnNames.add("单价");
-				columnNames.add("数量");
-				columnNames.add("总价");
-				initDataByVector(jsonObject);
-				DefaultTableModel dtm = new DefaultTableModel(this.vectorLabel, columnNames);
-				this.table.setModel(dtm);
-				TableCellRenderer tcr = new MyTableCellRender();
-				this.table.setDefaultRenderer(Object.class, tcr);
-				dm.queryUserInfo(str1);
-				Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
-				imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
-				glasspane.stop();
-				// 统一界面显示
-				// this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
-				this.userChange.setText(remains);
-				this.userImg.setIcon(imagIcon);
-				this.userName.setText(dm.getName());
-				this.userId.setText(dm.getMobile());
-			}else if (jsonObject.get("code").getAsString().equals("1050003")) {
-				glasspane.stop();
-				this.logsLabel.setText("没有查询到外卖订单信息");
-				this.logsLabel.setVisible(true);
-				this.logsLabel.setOpaque(true);
-				this.logsLabel.setHorizontalAlignment(JLabel.CENTER);
-				this.logsLabel.setFont(new Font("黑体",Font.BOLD,40));
-				this.jcLayeredPane.add(this.logsLabel,JLayeredPane.MODAL_LAYER);
-				new Thread(()->{
-					try {
-						Thread.sleep(2000);
-						wmFrame.this.jcLayeredPane.remove(wmFrame.this.logsLabel);
-						wmFrame.this.jcLayeredPane.repaint();
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}).start();
-			}
-			
-
-		}
+	public void weightDutiesDo(String string) {
 		if (string.startsWith("ST")) {
-			DecimalFormat df=new DecimalFormat(".##");
+			DecimalFormat df = new DecimalFormat(".##");
 			System.out.println(string);
 			string = string.substring(9);
-			this.weighLabel.setText(this.weighLabel.getText().substring(3)+":"+string);
+			this.weighLabel.setText(this.weighLabel.getText().substring(3) + ":" + string);
 			DefaultTableModel dtm = (DefaultTableModel) this.table.getModel();
 			this.list.remove(String.valueOf(this.table.getSelectedRow()));
-			if(((String) dtm.getValueAt(this.table.getSelectedRow(), 3)).equals("称重")){
+			if (((String) dtm.getValueAt(this.table.getSelectedRow(), 3)).equals("称重")) {
 				dtm.setValueAt(string, this.table.getSelectedRow(), 2);
 			}
-			Double price = Double.parseDouble(((String)dtm.getValueAt(this.table.getSelectedRow(), 1)).replaceAll("元", ""));
-			Double num = Double.parseDouble(((String)dtm.getValueAt(this.table.getSelectedRow(), 2)).replaceAll("kg", ""));
-			dtm.setValueAt(df.format(price*num)+"元", this.table.getSelectedRow(), 3);
-			new Thread(()->{
+			Double price = Double
+					.parseDouble(((String) dtm.getValueAt(this.table.getSelectedRow(), 1)).replaceAll("元", ""));
+			Double num = Double
+					.parseDouble(((String) dtm.getValueAt(this.table.getSelectedRow(), 2)).replaceAll("kg", ""));
+			dtm.setValueAt(df.format(price * num) + "元", this.table.getSelectedRow(), 3);
+			new Thread(() -> {
 				try {
 					Thread.sleep(1000);
 					wmFrame.this.jcLayeredPane.remove(wmFrame.this.weighLabel);
@@ -493,6 +414,109 @@ public class wmFrame implements MouseListener {
 
 		}
 		System.gc();
+	}
+
+	public void dutiesDo(String str1) {
+		String str2;
+		String remains = null;
+		JsonObject jsonObject = null;
+		ImageIcon imagIcon = null;
+		if (str1.length() == 11) {
+			glasspane.start();
+			jsonObject = new JsonObject();
+			jsonObject.addProperty("time", gainTime.gainDateAndTime());
+			jsonObject.addProperty("mobile", str1);
+			str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
+			jsonObject = new JsonObject();
+			jsonObject.addProperty("contents", str2);
+			// 第一次HTTP请求，获取用户信息
+			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jsonObject);
+			if(jsonObject.get("code").getAsString().equals("0")){
+				jsonObject = (JsonObject) jsonObject.get("data");
+				// 将token存入数据库中
+				dm.saveToken(jsonObject.get("mobile").getAsString(), jsonObject.get("remember_token").getAsString(),
+						gainTime.gainDateAndTime());
+				// 获取订单信息
+				jsonObject = new JsonObject();
+				jsonObject.addProperty("time", gainTime.gainDateAndTime());
+				jsonObject.addProperty("mobile", str1);
+				str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
+				jsonObject = new JsonObject();
+				jsonObject.addProperty("contents", str2);
+				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/takeout", jsonObject);
+				System.out.println(jsonObject.toString());
+				if (jsonObject.get("code").getAsString().equals("0")) {
+					Vector<String> columnNames = new Vector<String>();
+					columnNames.add("名称");
+					columnNames.add("单价");
+					columnNames.add("数量");
+					columnNames.add("总价");
+					initDataByVector(jsonObject);
+					DefaultTableModel dtm = new DefaultTableModel(this.vectorLabel, columnNames);
+					this.table.setModel(dtm);
+					TableCellRenderer tcr = new MyTableCellRender();
+					this.table.setDefaultRenderer(Object.class, tcr);
+					dm.queryUserInfo(str1);
+					Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
+					imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
+					glasspane.stop();
+					// 统一界面显示
+					// this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
+					this.userChange.setText(remains);
+					this.userImg.setIcon(imagIcon);
+					this.userName.setText(dm.getName());
+					this.userId.setText(dm.getMobile());
+				} else if (jsonObject.get("code").getAsString().equals("1050003")) {
+					glasspane.stop();
+					this.logsLabel.setText("没有查询到外卖订单信息");
+					this.logsLabel.setVisible(true);
+					this.logsLabel.setOpaque(true);
+					this.logsLabel.setHorizontalAlignment(JLabel.CENTER);
+					this.logsLabel.setFont(new Font("黑体", Font.BOLD, 40));
+					this.jcLayeredPane.add(this.logsLabel, JLayeredPane.MODAL_LAYER);
+					new Thread(() -> {
+						try {
+							Thread.sleep(2000);
+							wmFrame.this.jcLayeredPane.remove(wmFrame.this.logsLabel);
+							wmFrame.this.jcLayeredPane.repaint();
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}).start();
+				}else {
+					if(jsonObject.get("code").getAsString().equals("1050007")){
+						JOptionPane.showMessageDialog(null, "用户金额不足", "失败", JOptionPane.ERROR_MESSAGE);
+						this.glasspane.stop();
+						return;
+					}
+				}
+			}
+			
+
+		}else {
+			JOptionPane.showMessageDialog(null, "程序发生错误，请重启程序！", "失败", JOptionPane.ERROR_MESSAGE);
+		}
+
+		System.gc();
+	}
+
+	public void dealDuties(String string) {
+		String str1;
+		String string2;
+		if (string.length() == 52) {
+			string = string.substring(0, string.length() - 4);
+			str1 = toolsClass.toStringHex2(string);
+			string2 = Encrypt.decrypt2(str1, gainTime.gainDate()).substring(3);
+			System.out.println(string2);
+			dutiesDo(string2);
+		} else if (string.length() == 32) {
+			string2 = dm.searchWithNum(string);
+			dutiesDo(string2);
+		} else {
+			str1 = toolsClass.toStringHex2(string);
+			weightDutiesDo(str1);
+		}
 	}
 
 	public void initTable() {
@@ -518,11 +542,10 @@ public class wmFrame implements MouseListener {
 			vectors.add(jsonCache.get("name").getAsString());
 			vectors.add(toolsClass.coinToYuan(jsonCache.get("price").getAsString()));
 			vectors.add(jsonCache.get("num").getAsString());
-			
 			if (jsonCache.get("is_weigh").getAsString().equals("1")) {
 				this.list.add(String.valueOf(i));
 				vectors.add("称重");
-			}else {
+			} else {
 				vectors.add(toolsClass.coinToYuan(String.valueOf(Integer.parseInt(jsonCache.get("price").getAsString())
 						* Integer.parseInt(jsonCache.get("num").getAsString()))));
 			}
@@ -531,14 +554,13 @@ public class wmFrame implements MouseListener {
 
 	}
 
-
 	class MyTableCellRender extends DefaultTableCellRenderer {
 		public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus,
 				int row, int column) {
-			if(wmFrame.this.list.contains(String.valueOf(row))){
+			if (wmFrame.this.list.contains(String.valueOf(row))) {
 				setBackground(Color.red);
 				setForeground(Color.white);
-			}else {
+			} else {
 				setBackground(Color.white);
 				setForeground(Color.black);
 			}
@@ -546,7 +568,5 @@ public class wmFrame implements MouseListener {
 			return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 		}
 	}
-	
-	
 
 }

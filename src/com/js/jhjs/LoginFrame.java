@@ -27,6 +27,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
     private JLabel label ;
     private JLabel jLabel_jc;
     private JLabel jLabel_wm;
+    private JLabel jtxLogs;
     private JLayeredPane layeredPane = new JLayeredPane();
     private ArrayList<String> userlist = new ArrayList<String>();
     private JLabel userJlabel = null;
@@ -63,6 +64,9 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 	 public void setVisible(boolean b){
 		 this.frame.setVisible(b);
 	 }
+	 public boolean getVisibles(){
+		 return this.frame.isVisible();
+	 }
 	public void initLoginFrame(String bgPathname){
 		//frame初始设置
 		this.jtxPsd.setText("");
@@ -90,6 +94,13 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.jLabel_wm.setBounds(453, 630, 215, 86);
 		this.jLabel_wm.addMouseListener(this);
 		this.jLabel_wm.setHorizontalAlignment(JLabel.CENTER);
+//		//日志
+//		this.jtxLogs = new JLabel("请刷特权卡！");
+//		this.jtxLogs.setFont(font);
+//		this.jtxLogs.setForeground(Color.white);
+		
+//		this.jtxLogs.setBounds(157, 777, 400, 70);
+		
 		//为九宫格数字添加监听器
 		this.num0.addMouseListener(this);
 		this.num1.addMouseListener(this);
@@ -107,6 +118,7 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.panel2.setLayout(null);
 		this.panel2.add(jLabel_jc);
 		this.panel2.add(this.jLabel_wm);
+//		this.panel2.add(this.jtxLogs);
 		this.panel2.setSize(1280, 1024);
 		this.panel2.setLocation(0, 0);
 		this.panel2.setOpaque(false);
@@ -209,16 +221,20 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		if(e.getComponent().equals(this.jLabel_wm)){
 			if(!this.userJlabel.getText().equals("")){
 				if(!string.equals("")){
-					if(this.checkUsers(this.userJlabel.getText(), string)){
-						this.framsWM.setVisible(true,this.userJlabel.getText());
-						this.frame.setVisible(false);
-					}else {
-						JOptionPane.showMessageDialog(null,"请输入正确密码！" ,"密码错误" , JOptionPane.ERROR_MESSAGE);
-						this.jtxPsd.setText("");
-						this.psd = "";
-					}
+						if(this.checkUsers(this.userJlabel.getText(), string)){
+							this.framsWM.setVisible(true,this.userJlabel.getText());
+							this.frame.setVisible(false);
+						}else {
+							JOptionPane.showMessageDialog(null,"请输入正确密码！" ,"密码错误" , JOptionPane.ERROR_MESSAGE);
+							this.jtxPsd.setText("");
+							this.psd = "";
+						}
 				}else {
-					JOptionPane.showMessageDialog(null,"密码不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+					if(this.userJlabel.getText().equals("ADMIN")){
+						
+					}else {
+						JOptionPane.showMessageDialog(null,"密码不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}else {
 				JOptionPane.showMessageDialog(null,"用户名不能为空!" ,"错误" , JOptionPane.ERROR_MESSAGE);

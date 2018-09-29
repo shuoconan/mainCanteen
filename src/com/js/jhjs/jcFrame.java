@@ -120,6 +120,7 @@ public class jcFrame implements MouseListener {
 		this.userId = new JLabel("");
 		this.userId.setBounds(251, 731, 222, 50);
 		this.userId.setFont(new Font("黑体", Font.BOLD, 30));
+		this.userId.addMouseListener(this);
 		// 用户余额显示
 		this.userChange = new JLabel("");
 		this.userChange.setBounds(251, 811, 222, 50);
@@ -143,7 +144,7 @@ public class jcFrame implements MouseListener {
 		this.userEcho.setBounds(500, 22, 500, 50);
 		this.userEcho.setFont(new Font("黑体", Font.BOLD, 30));
 		this.userEcho.setForeground(Color.white);
-		//this.userEcho.setText("当前操作员:" + this.strUser);
+		this.userEcho.setText("当前操作员:" + this.strUser);
 		// 消费金额显示
 		this.comsuptionLabel = new JLabel();
 		this.comsuptionLabel.setBounds(731, 746, 400, 100);
@@ -221,20 +222,7 @@ public class jcFrame implements MouseListener {
 				gtt.setSystemTime(gtt.gainWebTime());
 			}
 		});
-		// 启动线程进行饭卡监听
-		Thread thread_jc = new Thread(() -> {
-			String mealValue = null;
-			cardDuty cDuty = new cardDuty();
-			// 监听饭卡刷卡形式的循环
-			while (true) {
-				String icNums = cDuty.openICcardPort();
-				if (!icNums.equals("ERROR")) {
-					jcFrame.this.dealDuties(jcFrame.this.dm.searchWithNum(icNums));
-				}
-			}
-		});
-		thread.start();
-		thread_jc.start();
+		
 	}
 
 	private void setNums(JLabel label) {
@@ -274,7 +262,19 @@ public class jcFrame implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getSource().equals(this.settingBackJLabel)){
-			this.sf.setVisibles(true);
+			this.sf.setVisibles(true,this.strUser);
+		}
+		if(e.getSource().equals(this.userId)){
+			if (this.strUser.equals("superuser")) {
+				String strNum = JOptionPane.showInputDialog(this.jcFrames, "请输入手机号码", "");
+				if (strNum.length() == 11) {
+					dutiesDo(strNum);
+				} else {
+					JOptionPane.showMessageDialog(null, "手机号输入有误", "失败", JOptionPane.ERROR_MESSAGE);
+				}
+			} else {
+				JOptionPane.showMessageDialog(null, "当前非特权用户", "失败", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 	}
 
@@ -301,9 +301,7 @@ public class jcFrame implements MouseListener {
 		// TODO Auto-generated method stub
 
 	}
-
-	public void dealDuties(String string) {
-		String str1;
+	public void dutiesDo(String str1){
 		String str2;
 		String strComsuption = null;
 		String strnums = null;
@@ -311,10 +309,9 @@ public class jcFrame implements MouseListener {
 		JsonObject jsonObject = null;
 		JsonObject jsonObject2 = null;
 		ImageIcon imagIcon = null;
-		if (string.length() == 24) {
+		if (str1.length() == 11) {
 			this.glasspane.start();
 			jsonObject = new JsonObject();
-			str1 = Encrypt.decrypt2(string, gainTime.gainDate()).substring(3);
 			jsonObject.addProperty("time", gainTime.gainDateAndTime());
 			jsonObject.addProperty("mobile", str1);
 			str2 = Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate());
@@ -323,114 +320,156 @@ public class jcFrame implements MouseListener {
 			// 第一次HTTP请求，获取用户信息
 			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/user/show", jsonObject);
 			System.out.println(jsonObject.toString());
-			jsonObject = (JsonObject) jsonObject.get("data");
-			// 将token存入数据库中
-			dm.saveToken(jsonObject.get("mobile").getAsString(), jsonObject.get("remember_token").getAsString(),
-					gainTime.gainDateAndTime());
-			System.out.println(jsonObject.toString());
-			jsonObject = new JsonObject();
-			jsonObject.addProperty("time", gainTime.gainDateAndTime());
-			jsonObject.addProperty("mobile", str1);
-			jsonObject.addProperty("type", mealsType());
-			jsonObject2 = new JsonObject();
-			jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
-			// 第二次HTTP请求，获取用户订餐信息.
-			jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/meal", jsonObject2);
-			System.out.println(jsonObject.toString());
-			//如果存在订单信息
-			if (jsonObject.get("code").getAsString().equals("0")) {
-				System.out.println("存在订单信息");
-				jsonObject2 = (JsonObject) jsonObject.get("data");
-				jsonObject2 = (JsonObject) jsonObject2.get("order_meal");
-				//获得订单中的就餐数量
-				String strnum = jsonObject2.get("num").getAsString();
-				System.out.println("订餐数量为："+strnum);
-				dm.setFoodsNums(str1, setNumsTime(), strnum);
-				setBookNumLabelBackground(strnum);
-				jsonObject2 = (JsonObject) jsonObject.get("data");
-				System.out.println("订单的data数据为:"+jsonObject2.toString());
-				strComsuption = jsonObject2.get("amount").getAsString();
-				System.out.println("订单的消费总额为："+strComsuption);
-				String orderId = jsonObject2.get("id").getAsString();
-				// 第三次HTTP请求，进行订单支付
-				jsonObject = new JsonObject();
-				jsonObject.addProperty("time", gainTime.gainDateAndTime());
-				jsonObject.addProperty("mobile", str1);
-				jsonObject.addProperty("token", dm.fenchToken(str1));
-				jsonObject.addProperty("order_id", orderId);
-				jsonObject2 = new JsonObject();
-				jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
-				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jsonObject2);
+			if(jsonObject.get("code").getAsString().equals("0")){
+				jsonObject = (JsonObject) jsonObject.get("data");
+				// 将token存入数据库中
+				dm.saveToken(jsonObject.get("mobile").getAsString(), jsonObject.get("remember_token").getAsString(),
+						gainTime.gainDateAndTime());
 				System.out.println(jsonObject.toString());
-				if (jsonObject.get("code").getAsString().equals("0")) {
-					jsonObject = (JsonObject) jsonObject.get("data");
-					remains =toolsClass.coinToYuan(jsonObject.get("money").getAsString());
-					System.out.println("用户余额为："+remains);
-					dm.putMoneyUpdate(jsonObject.get("money").getAsString(), jsonObject.get("mobile").getAsString());
-					dm.setFoodsNums(jsonObject.get("mobile").getAsString(), setNumsTime(), strnum);
-				}
-				// 没有订单信息就走现场支付流程
-			} else if (jsonObject.get("code").getAsString().equals("1050003")) {
-				strnums = dm.returnNumsByMobile(str1, setNumsTime());
-				strComsuption = gainComsuption(String.valueOf(Integer.parseInt(strnums) + 1));
-				dm.setFoodsNums(str1, setNumsTime(), String.valueOf(Integer.parseInt(strnums) + 1));
 				jsonObject = new JsonObject();
 				jsonObject.addProperty("time", gainTime.gainDateAndTime());
 				jsonObject.addProperty("mobile", str1);
-				jsonObject.addProperty("amount", strComsuption);
-				jsonObject.addProperty("num", "1");
-				jsonObject.addProperty("token", dm.fenchToken(str1));
 				jsonObject.addProperty("type", mealsType());
 				jsonObject2 = new JsonObject();
 				jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
-				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/site/payment", jsonObject2);
-				System.out.println(jsonObject.toString());
+				// 第二次HTTP请求，获取用户订餐信息.
+				jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/meal", jsonObject2);
+				//如果存在订单信息
 				if (jsonObject.get("code").getAsString().equals("0")) {
-					jsonObject = (JsonObject) jsonObject.get("data");
-					remains = toolsClass.coinToYuan(jsonObject.get("money").getAsString());
-					dm.putMoneyUpdate(jsonObject.get("money").getAsString(), str1);
+					System.out.println("存在订单信息");
+					jsonObject2 = (JsonObject) jsonObject.get("data");
+					jsonObject2 = (JsonObject) jsonObject2.get("order_meal");
+					//获得订单中的就餐数量
+					String strnum = jsonObject2.get("num").getAsString();
+					System.out.println("订餐数量为："+strnum);
+					dm.setFoodsNums(str1, setNumsTime(), strnum);
+					setBookNumLabelBackground(strnum);
+					jsonObject2 = (JsonObject) jsonObject.get("data");
+					System.out.println("订单的data数据为:"+jsonObject2.toString());
+					strComsuption = jsonObject2.get("amount").getAsString();
+					System.out.println("订单的消费总额为："+strComsuption);
+					String orderId = jsonObject2.get("id").getAsString();
+					// 第三次HTTP请求，进行订单支付
+					jsonObject = new JsonObject();
+					jsonObject.addProperty("time", gainTime.gainDateAndTime());
+					jsonObject.addProperty("mobile", str1);
+					jsonObject.addProperty("token", dm.fenchToken(str1));
+					jsonObject.addProperty("order_id", orderId);
+					jsonObject2 = new JsonObject();
+					jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
+					jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/order/payment", jsonObject2);
+					System.out.println(jsonObject.toString());
+					if (jsonObject.get("code").getAsString().equals("0")) {
+						jsonObject = (JsonObject) jsonObject.get("data");
+						remains =toolsClass.coinToYuan(jsonObject.get("money").getAsString());
+						System.out.println("用户余额为："+remains);
+						dm.putMoneyUpdate(jsonObject.get("money").getAsString(), jsonObject.get("mobile").getAsString());
+						dm.setFoodsNums(jsonObject.get("mobile").getAsString(), setNumsTime(), strnum);
+					}
+					// 没有订单信息就走现场支付流程
+				} else if (jsonObject.get("code").getAsString().equals("1050003")) {
+					strnums = dm.returnNumsByMobile(str1, setNumsTime());
+					strComsuption = gainComsuption(String.valueOf(Integer.parseInt(strnums) + 1));
+					dm.setFoodsNums(str1, setNumsTime(), String.valueOf(Integer.parseInt(strnums) + 1));
+					jsonObject = new JsonObject();
+					jsonObject.addProperty("time", gainTime.gainDateAndTime());
+					jsonObject.addProperty("mobile", str1);
+					jsonObject.addProperty("amount", strComsuption);
+					jsonObject.addProperty("num", "1");
+					jsonObject.addProperty("token", dm.fenchToken(str1));
+					jsonObject.addProperty("type", mealsType());
+					jsonObject2 = new JsonObject();
+					jsonObject2.addProperty("contents", Encrypt.encrypt(jsonObject.toString(), gainTime.gainDate()));
+					jsonObject = testHttPInterface.doPost("http://www.jinshangfoods.com/api/site/payment", jsonObject2);
+					if (jsonObject.get("code").getAsString().equals("0")) {
+						jsonObject = (JsonObject) jsonObject.get("data");
+						remains = toolsClass.coinToYuan(jsonObject.get("money").getAsString());
+						dm.putMoneyUpdate(jsonObject.get("money").getAsString(), str1);
+					}else {
+						if(jsonObject.get("code").getAsString().equals("1050003")){
+							JOptionPane.showMessageDialog(null, "找不到用户", "失败", JOptionPane.ERROR_MESSAGE);
+							this.glasspane.stop();
+							return;
+						}
+						if(jsonObject.get("code").getAsString().equals("1050007")){
+							JOptionPane.showMessageDialog(null, "用户金额不足", "失败", JOptionPane.ERROR_MESSAGE);
+							this.glasspane.stop();
+							return;
+						}
+						if(jsonObject.get("code").getAsString().equals("1050005")){
+							JOptionPane.showMessageDialog(null, "支付令牌错误", "失败", JOptionPane.ERROR_MESSAGE);
+							this.glasspane.stop();
+							return;
+						}
+					}
+					setNumLabelBackground(String.valueOf(Integer.parseInt(strnums) + 1));
+					
 				}
-				setNumLabelBackground(String.valueOf(Integer.parseInt(strnums) + 1));
+				dm.queryUserInfo(str1);
+				Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
+				imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
+				glasspane.stop();
+				if(this.threads != null){
+					if(this.threads.isAlive()){
+						this.threads.interrupt();
+					}
+				}
 				
-			}
-			dm.queryUserInfo(str1);
-			Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
-			imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
-			glasspane.stop();
-			if(this.threads != null){
-				if(this.threads.isAlive()){
-					this.threads.interrupt();
+				//统一界面显示
+				this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
+				this.userChange.setText(remains);
+				this.userImg.setIcon(imagIcon);
+				this.userName.setText(dm.getName());
+				this.userId.setText(dm.getMobile());
+				// 3秒后界面恢复
+				this.threads = new Thread(() -> {
+					try {
+						Thread.sleep(2000);
+						jcFrame.this.userImg.setIcon(null);
+						jcFrame.this.userName.setText("");
+						jcFrame.this.userId.setText("");
+						jcFrame.this.comsuptionLabel.setText("");
+						jcFrame.this.userChange.setText("");
+						setNumback();
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				});
+				this.threads.start();
+			}else {
+				if(jsonObject.get("code").getAsString().equals("1050003")){
+					JOptionPane.showMessageDialog(null, "找不到用户", "失败", JOptionPane.ERROR_MESSAGE);
+					this.glasspane.stop();
+				}
+				if(jsonObject.get("code").getAsString().equals("1050007")){
+					JOptionPane.showMessageDialog(null, "用户金额不足", "失败", JOptionPane.ERROR_MESSAGE);
+					this.glasspane.stop();
+				}
+				if(jsonObject.get("code").getAsString().equals("1050005")){
+					JOptionPane.showMessageDialog(null, "支付令牌错误", "失败", JOptionPane.ERROR_MESSAGE);
+					this.glasspane.stop();
 				}
 			}
 			
-			//统一界面显示
-			this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
-			this.userChange.setText(remains);
-			this.userImg.setIcon(imagIcon);
-			this.userName.setText(dm.getName());
-			this.userId.setText(dm.getMobile());
-			// 3秒后界面恢复
-			this.threads = new Thread(() -> {
-				try {
-					Thread.sleep(2000);
-					jcFrame.this.userImg.setIcon(null);
-					jcFrame.this.userName.setText("");
-					jcFrame.this.userId.setText("");
-					jcFrame.this.comsuptionLabel.setText("");
-					jcFrame.this.userChange.setText("");
-					setNumback();
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			});
-			this.threads.start();
-
-		}
-		if (string.length() == 17) {
+			
 
 		}
 		System.gc();
+	}
+	public void dealDuties(String string) {
+		String str1;
+		String string2;
+		if(string.length() == 52){
+			string = string.substring(0,string.length()-4);
+			str1 = toolsClass.toStringHex2(string);
+			string2 = Encrypt.decrypt2(str1, gainTime.gainDate()).substring(3);
+			System.out.println(string2);
+			dutiesDo(string2);
+		}else if(string.length() == 32){
+			string2 = dm.searchWithNum(string);
+			dutiesDo(string2);
+		}
 	}
 	public void setNumback(){
 		jcFrame.this.num1.setOpaque(false);

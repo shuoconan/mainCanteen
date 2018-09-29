@@ -25,16 +25,18 @@ public class settingFrame implements MouseListener{
 	private jcFrame jfs;
 	private wmFrame wmfs;
 	private LoginFrame lfs;
+	private CardCheck cc;
 	
 	public settingFrame(String string){
 		this.initSettingFrame();
 		this.strUser = string;
 	}
 
-	public void setOtherFrame(jcFrame jfs,wmFrame wmfs,LoginFrame lfs){
+	public void setOtherFrame(jcFrame jfs,wmFrame wmfs,LoginFrame lfs,CardCheck cc){
 		this.lfs = lfs;
 		this.jfs = jfs;
 		this.wmfs = wmfs;
+		this.cc = cc;
 	}
 	public void initSettingFrame(){
 		this.settingJFrame = new JFrame("设置");
@@ -57,7 +59,7 @@ public class settingFrame implements MouseListener{
 		this.switchFrame.setBounds(0, 150, 300, 50);
 		this.setButtonLableStyle(this.switchFrame);
 		
-		this.serialLabel = new JLabel("串口设置");
+		this.serialLabel = new JLabel("卡片校验");
 		this.serialLabel.setBounds(0, 200, 300, 50);
 		this.setButtonLableStyle(this.serialLabel);
 		
@@ -77,6 +79,10 @@ public class settingFrame implements MouseListener{
 		label.setOpaque(true);
 		label.addMouseListener(this);
 	}
+	public void setVisibles(boolean b,String str){
+		this.settingJFrame.setVisible(b);
+		this.strUser = str;
+	}
 	public void setVisibles(boolean b){
 		this.settingJFrame.setVisible(b);
 	}
@@ -89,7 +95,7 @@ public class settingFrame implements MouseListener{
 				this.wmfs.setVisible(true, this.strUser);
 				this.jfs.setVisible(false, this.strUser);
 			}else {
-				this.wmfs.setVisible(true, this.strUser);
+				this.wmfs.setVisible(false, this.strUser);
 				this.jfs.setVisible(true, this.strUser);
 			}
 			
@@ -98,6 +104,9 @@ public class settingFrame implements MouseListener{
 			this.wmfs.setVisible(false, this.strUser);
 			this.jfs.setVisible(false, this.strUser);
 			this.lfs.setVisible(true);
+		}
+		if(e.getComponent().equals(this.serialLabel)){
+			this.cc.setVisibles(true);
 		}
 	}
 	@Override

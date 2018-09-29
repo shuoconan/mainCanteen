@@ -83,9 +83,13 @@ public class Encrypt {
 	 public static byte[] parseBase642Byte(String base64Str){
 		 final Base64.Decoder base64Decoder = Base64.getDecoder();
 		 if(base64Str == null){
+			 System.out.println("12345");
 			 return null;
 		 }
+		 System.out.println("123456");
+		 System.out.println(base64Str);
 		 byte[] result = base64Decoder.decode(base64Str);
+		 System.out.println("1234567");
 		 return result;
 	 }
 	 public static String parseByte2Base64(byte[] bytes){
@@ -97,19 +101,23 @@ public class Encrypt {
 		 return string;
 	 }
 	 public static String decrypt2(String content, String password){ 
+		 System.out.println("12");
 		 byte[] toDecrypt = parseBase642Byte(content);
+		 System.out.println("1234");
          try {
     		 SecretKeySpec key = new SecretKeySpec(password.getBytes(), "AES"); 
 			 Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
 			 cipher.init(Cipher.DECRYPT_MODE, key);// ≥ı ºªØ
+			 System.out.println("123");
 			 byte[]  result = cipher.doFinal(toDecrypt);//result = cipher.update(toDecrypt);
 			 String string = new String(result);
 			 return string;
 			 
-		} catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+		} catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+        System.out.println("NO");
 		return null;
          
 	 }
