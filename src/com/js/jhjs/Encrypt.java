@@ -10,6 +10,7 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.swing.JOptionPane;
 
 public class Encrypt {
 	public static String encrypt2(String content, String password) {  
@@ -101,9 +102,7 @@ public class Encrypt {
 		 return string;
 	 }
 	 public static String decrypt2(String content, String password){ 
-		 System.out.println("12");
 		 byte[] toDecrypt = parseBase642Byte(content);
-		 System.out.println("1234");
          try {
     		 SecretKeySpec key = new SecretKeySpec(password.getBytes(), "AES"); 
 			 Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
@@ -115,9 +114,9 @@ public class Encrypt {
 			 
 		} catch (NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException | BadPaddingException | InvalidKeyException e) {
 			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "¶þÎ¬ÂëÒÑÊ§Ð§£¡", "Ê§°Ü", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();
 		}
-        System.out.println("NO");
 		return null;
          
 	 }

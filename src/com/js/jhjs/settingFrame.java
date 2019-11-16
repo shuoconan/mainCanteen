@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
@@ -20,30 +21,31 @@ public class settingFrame implements MouseListener{
 	private JLabel switchFrame;
 	private JLabel checkUpdate;
 	private JLabel serialLabel;
+	private JLabel shutDown;
 	private JFrame jf;
 	private String strUser;
 	private jcFrame jfs;
 	private wmFrame wmfs;
 	private LoginFrame lfs;
-	private CardCheck cc;
+	private lxwmFrame lxf;
 	
 	public settingFrame(String string){
 		this.initSettingFrame();
 		this.strUser = string;
 	}
 
-	public void setOtherFrame(jcFrame jfs,wmFrame wmfs,LoginFrame lfs,CardCheck cc){
+	public void setOtherFrame(jcFrame jfs,wmFrame wmfs,LoginFrame lfs,lxwmFrame lxf){
 		this.lfs = lfs;
 		this.jfs = jfs;
 		this.wmfs = wmfs;
-		this.cc = cc;
+		this.lxf = lxf;
 	}
 	public void initSettingFrame(){
 		this.settingJFrame = new JFrame("设置");
 		this.settingJFrame.setBounds(100, 100, 300, 400);
 		this.jPanel.setBounds(0, 0, 300, 800);
 		this.jPanel.setLayout(null);
-		this.updatePsd = new JLabel("修改密码");
+		this.updatePsd = new JLabel("零星外卖");
 		this.updatePsd.setBounds(0,0,300,50);
 		this.setButtonLableStyle(this.updatePsd);
 		
@@ -51,11 +53,11 @@ public class settingFrame implements MouseListener{
 		this.loginOut.setBounds(0,50,300,50);
 		this.setButtonLableStyle(this.loginOut);
 		
-		this.checkUpdate = new JLabel("检查更新");
+		this.checkUpdate = new JLabel("食堂刷卡");
 		this.checkUpdate.setBounds(0, 100, 300, 50);
 		this.setButtonLableStyle(this.checkUpdate);
 		
-		this.switchFrame = new JLabel("切换业务");
+		this.switchFrame = new JLabel("切换外卖");
 		this.switchFrame.setBounds(0, 150, 300, 50);
 		this.setButtonLableStyle(this.switchFrame);
 		
@@ -63,11 +65,16 @@ public class settingFrame implements MouseListener{
 		this.serialLabel.setBounds(0, 200, 300, 50);
 		this.setButtonLableStyle(this.serialLabel);
 		
+		this.shutDown = new JLabel("关闭程序");
+		this.shutDown.setBounds(0, 250, 300, 50);
+		this.setButtonLableStyle(this.shutDown);
+		
 		this.jPanel.add(this.updatePsd);
 		this.jPanel.add(this.checkUpdate);
 		this.jPanel.add(this.loginOut);
 		this.jPanel.add(this.switchFrame);
 		this.jPanel.add(this.serialLabel);
+		this.jPanel.add(this.shutDown);
 		
 		this.settingJFrame.add(jPanel);
 	}
@@ -90,24 +97,48 @@ public class settingFrame implements MouseListener{
 	public void mouseClicked(MouseEvent e) {
 		// TODO Auto-generated method stub
 		if(e.getComponent().equals(this.switchFrame)){
-			//this.jf.dispose();
-			if (this.jfs.getVisible()) {
+			if(this.wmfs.getVisible()){
+				JOptionPane.showMessageDialog(null, "外卖窗口已打开！", "打开失败", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}else {
 				this.wmfs.setVisible(true, this.strUser);
 				this.jfs.setVisible(false, this.strUser);
+				this.lxf.setVisible(false, this.strUser);
+				this.settingJFrame.dispose();
+			}
+		}
+		if(e.getComponent().equals(this.checkUpdate)){
+			if(this.jfs.getVisible()){
+				JOptionPane.showMessageDialog(null, "食堂就餐窗口已打开！", "打开失败", JOptionPane.INFORMATION_MESSAGE);
+				return;
+			}else {
+				this.jfs.setVisible(true, this.strUser);
+				this.wmfs.setVisible(false, this.strUser);
+				this.lxf.setVisible(false, this.strUser);
+				this.settingJFrame.dispose();
+			}
+		}
+		if(e.getComponent().equals(this.updatePsd)){
+			if(this.lxf.getVisible()){
+				JOptionPane.showMessageDialog(null, "外卖窗口已打开！", "打开失败", JOptionPane.INFORMATION_MESSAGE);
+				return;
 			}else {
 				this.wmfs.setVisible(false, this.strUser);
-				this.jfs.setVisible(true, this.strUser);
+				this.jfs.setVisible(false, this.strUser);
+				this.lxf.setVisible(true, this.strUser);
+				this.settingJFrame.dispose();
 			}
-			
 		}
 		if(e.getComponent().equals(this.loginOut)){
 			this.wmfs.setVisible(false, this.strUser);
 			this.jfs.setVisible(false, this.strUser);
 			this.lfs.setVisible(true);
+			this.settingJFrame.dispose();
 		}
-		if(e.getComponent().equals(this.serialLabel)){
-			this.cc.setVisibles(true);
+		if(e.getComponent().equals(this.shutDown)){
+			System.exit(0);
 		}
+		
 	}
 	@Override
 	public void mousePressed(MouseEvent e) {

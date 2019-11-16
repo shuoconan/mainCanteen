@@ -62,6 +62,10 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.initLoginFrame("img/1.jpg");
 	}
 	 public void setVisible(boolean b){
+		 createDialPanel();
+		 this.userJlabel.setText("");
+		 this.psd = "";
+		 this.jtxPsd.setText("");
 		 this.frame.setVisible(b);
 	 }
 	 public boolean getVisibles(){
@@ -368,8 +372,10 @@ public class LoginFrame implements MouseListener,ListSelectionListener{
 		this.userJlabel.setText(this.userJList.getSelectedValue());
 	}
 	public boolean checkUsers(String username,String userpsd){
+		System.out.println(username);
 		md5Duty m5d = new md5Duty();
 		String userpassword = this.dbm.queryStringUser(username);
+		System.out.println(userpassword);
 		if(userpassword.equals(m5d.toMd5(userpsd))){
 			return true;
 		}else {

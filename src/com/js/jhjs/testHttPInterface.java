@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 import org.apache.http.Consts;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,7 +25,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -34,7 +35,7 @@ import com.google.gson.JsonParser;
 
 public class testHttPInterface {
 	 public static JsonObject doPost(String url,JsonObject json){
-		    HttpClient client = new DefaultHttpClient();
+		    HttpClient client = HttpClients.createDefault();
 		    HttpPost post = new HttpPost(url);
 		    JsonObject response = null;
 		    String result = null;
@@ -49,6 +50,8 @@ public class testHttPInterface {
 		        result = unicodeToString(EntityUtils.toString(res.getEntity()));// 返回json格式：
 		      }
 		    } catch (Exception e) {
+		      JOptionPane.showMessageDialog(null, "网络错误,点击确定程序退出！", "失败", JOptionPane.ERROR_MESSAGE);		   
+		      System.exit(0);
 		      throw new RuntimeException(e);
 		    }
 		    return str2Json(result);

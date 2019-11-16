@@ -32,7 +32,7 @@ public class gainTime {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		return sdf.format(new Date());
 	}
-	public String gainTime(){
+	public static String gainTime(){
 		SimpleDateFormat sdf = new SimpleDateFormat("HHmm");
 		return sdf.format(new Date());
 	}

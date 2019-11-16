@@ -76,7 +76,7 @@ public class wmFrame implements MouseListener {
 	private JLayeredPane jcLayeredPane = new JLayeredPane();
 	private String strUser = "";
 	private JScrollPane jp = null;
-	private DatabaseManipulate dm = new DatabaseManipulate();
+//	private DatabaseManipulate dm = new DatabaseManipulate();
 	private InfiniteProgressPanel glasspane = new InfiniteProgressPanel();
 	private Vector<Vector<String>> vectorLabel = new Vector<Vector<String>>();
 	private JTable table = new JTable();
@@ -163,7 +163,7 @@ public class wmFrame implements MouseListener {
 		this.payMoney.setHorizontalAlignment(JLabel.CENTER);
 		this.payMoney.addMouseListener(this);
 		// 称重界面显示
-		this.weighLabel = new JLabel("这是称重界面");
+		this.weighLabel = new JLabel("");
 		this.weighLabel.setBounds(200, 400, 880, 228);
 		this.weighLabel.setVisible(false);
 		this.weighLabel.setBackground(Color.white);
@@ -177,11 +177,11 @@ public class wmFrame implements MouseListener {
 		this.totalLabel.setBounds(883, 648, 262, 60);
 		this.totalLabel.setFont(new Font("黑体", Font.BOLD, 30));
 		// 待支付金额显示
-		this.toPayLabel = new JLabel("这是待支付金额界面");
+		this.toPayLabel = new JLabel("");
 		this.toPayLabel.setBounds(883, 726, 262, 60);
 		this.toPayLabel.setFont(new Font("黑体", Font.BOLD, 30));
 		// 支付金额显示
-		this.payLabel = new JLabel("这是支付金额界面");
+		this.payLabel = new JLabel("");
 		this.payLabel.setBounds(883, 807, 262, 60);
 		this.payLabel.setFont(new Font("黑体", Font.BOLD, 30));
 
@@ -210,28 +210,6 @@ public class wmFrame implements MouseListener {
 		wmFrames.setGlassPane(glasspane);
 		this.wmFrames.add(this.jcLayeredPane);
 		// 启动线程进行对时操作
-		Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// TODO Auto-generated method stub
-				gainTime gtt = new gainTime();
-				if (gtt.gainWebTime().equals("GAINERROR")) {
-					Toolkit.getDefaultToolkit().beep();
-					JOptionPane.showMessageDialog(null, "对时失败，请注意系统时间是否正确！", "对时失败", JOptionPane.INFORMATION_MESSAGE);
-				} else {
-					wmFrame.this.logLabel.setText("系统对时成功！");
-					try {
-						Thread.sleep(3000);
-						wmFrame.this.logLabel.setText("");
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-				}
-				gtt.setSystemTime(gtt.gainWebTime());
-			}
-		});
-		thread.start();
 	}
 
 	public void addTimeLabel() {
@@ -240,7 +218,6 @@ public class wmFrame implements MouseListener {
 			public void run() {
 				// TODO Auto-generated method stub
 				gainTime gTime = new gainTime();
-				gTime.setSystemTime(gTime.gainDateAndTime());
 				String string = "";
 				while (true) {
 					string = "";
@@ -302,13 +279,13 @@ public class wmFrame implements MouseListener {
 			if(jObject.get("code").getAsString().equals("0")){
 				jObject = (JsonObject) jObject.get("data");
 				// 将token存入数据库中
-				dm.saveToken(jObject.get("mobile").getAsString(), jObject.get("remember_token").getAsString(),
+				DatabaseManipulate.saveToken(jObject.get("mobile").getAsString(), jObject.get("remember_token").getAsString(),
 						gainTime.gainDateAndTime());
 				jObject = new JsonObject();
 				jObject2 = new JsonObject();
 				jObject.addProperty("time", gainTime.gainDateAndTime());
 				jObject.addProperty("mobile", this.userId.getText());
-				jObject.addProperty("token", dm.fenchToken(this.userId.getText()));
+				jObject.addProperty("token", DatabaseManipulate.fenchToken(this.userId.getText()));
 				jObject.addProperty("order_id", this.orderId);
 				jObject.addProperty("price",
 						String.valueOf(toolsClass.yuanToDouble(this.totalLabel.getText().replaceAll("元", ""))
@@ -319,9 +296,38 @@ public class wmFrame implements MouseListener {
 				if (jObject.get("code").getAsString().equals("0")) {
 					jObject = (JsonObject) jObject.get("data");
 					this.userChange.setText(toolsClass.coinToYuan(jObject.get("money").getAsString()));
-					JOptionPane.showMessageDialog(null, "支付成功", "支付成功", JOptionPane.YES_OPTION);
+					this.logsLabel.setText("支付成功");
+					this.logsLabel.setVisible(true);
+					this.logsLabel.setOpaque(true);
+					this.logsLabel.setHorizontalAlignment(JLabel.CENTER);
+					this.logsLabel.setFont(new Font("黑体", Font.BOLD, 40));
+					this.jcLayeredPane.add(this.logsLabel, JLayeredPane.MODAL_LAYER);
+					new Thread(() -> {
+						try {
+							Thread.sleep(2000);
+							wmFrame.this.jcLayeredPane.remove(wmFrame.this.logsLabel);
+							wmFrame.this.jcLayeredPane.repaint();
+						} catch (InterruptedException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}).start();
 				} else {
-					JOptionPane.showMessageDialog(null, "支付失败", "支付失败", JOptionPane.ERROR_MESSAGE);
+					if(jObject.get("code").getAsString().equals("1050003")){
+						JOptionPane.showMessageDialog(null, "找不到用户", "失败", JOptionPane.ERROR_MESSAGE);
+						this.glasspane.stop();
+						return;
+					}
+					if(jObject.get("code").getAsString().equals("1050007")){
+						JOptionPane.showMessageDialog(null, "用户金额不足", "失败", JOptionPane.ERROR_MESSAGE);
+						this.glasspane.stop();
+						return;
+					}
+					if(jObject.get("code").getAsString().equals("1050005")){
+						JOptionPane.showMessageDialog(null, "支付令牌错误", "失败", JOptionPane.ERROR_MESSAGE);
+						this.glasspane.stop();
+						return;
+					}
 				}
 				new Thread(() -> {
 					try {
@@ -349,7 +355,7 @@ public class wmFrame implements MouseListener {
 		if (e.getComponent().equals(this.userId)) {
 			if (this.strUser.equals("superuser")) {
 				String strNum = JOptionPane.showInputDialog(this.wmFrames, "请输入手机号码", "");
-				if (strNum.length() == 11) {
+				if (strNum.length() == 6) {
 					dutiesDo(strNum);
 				} else {
 					JOptionPane.showMessageDialog(null, "手机号输入有误", "失败", JOptionPane.ERROR_MESSAGE);
@@ -398,6 +404,7 @@ public class wmFrame implements MouseListener {
 			}
 			Double price = Double
 					.parseDouble(((String) dtm.getValueAt(this.table.getSelectedRow(), 1)).replaceAll("元", ""));
+			price = price*2;
 			Double num = Double
 					.parseDouble(((String) dtm.getValueAt(this.table.getSelectedRow(), 2)).replaceAll("kg", ""));
 			dtm.setValueAt(df.format(price * num) + "元", this.table.getSelectedRow(), 3);
@@ -421,7 +428,7 @@ public class wmFrame implements MouseListener {
 		String remains = null;
 		JsonObject jsonObject = null;
 		ImageIcon imagIcon = null;
-		if (str1.length() == 11) {
+		if (str1.length() == 6) {
 			glasspane.start();
 			jsonObject = new JsonObject();
 			jsonObject.addProperty("time", gainTime.gainDateAndTime());
@@ -434,7 +441,7 @@ public class wmFrame implements MouseListener {
 			if(jsonObject.get("code").getAsString().equals("0")){
 				jsonObject = (JsonObject) jsonObject.get("data");
 				// 将token存入数据库中
-				dm.saveToken(jsonObject.get("mobile").getAsString(), jsonObject.get("remember_token").getAsString(),
+				DatabaseManipulate.saveToken(jsonObject.get("mobile").getAsString(), jsonObject.get("remember_token").getAsString(),
 						gainTime.gainDateAndTime());
 				// 获取订单信息
 				jsonObject = new JsonObject();
@@ -448,7 +455,7 @@ public class wmFrame implements MouseListener {
 				if (jsonObject.get("code").getAsString().equals("0")) {
 					Vector<String> columnNames = new Vector<String>();
 					columnNames.add("名称");
-					columnNames.add("单价");
+					columnNames.add("单价(份|KG)");
 					columnNames.add("数量");
 					columnNames.add("总价");
 					initDataByVector(jsonObject);
@@ -456,16 +463,16 @@ public class wmFrame implements MouseListener {
 					this.table.setModel(dtm);
 					TableCellRenderer tcr = new MyTableCellRender();
 					this.table.setDefaultRenderer(Object.class, tcr);
-					dm.queryUserInfo(str1);
-					Image img = Toolkit.getDefaultToolkit().createImage(dm.getBytes(), 0, dm.getBytes().length);
+					DatabaseManipulate.queryUserInfo(str1);
+					Image img = Toolkit.getDefaultToolkit().createImage(DatabaseManipulate.getBytes(), 0, DatabaseManipulate.getBytes().length);
 					imagIcon = new ImageIcon(img.getScaledInstance(280, 367, 0));
 					glasspane.stop();
 					// 统一界面显示
 					// this.comsuptionLabel.setText(toolsClass.coinToYuan(strComsuption));
 					this.userChange.setText(remains);
 					this.userImg.setIcon(imagIcon);
-					this.userName.setText(dm.getName());
-					this.userId.setText(dm.getMobile());
+					this.userName.setText(DatabaseManipulate.getName());
+					this.userId.setText(DatabaseManipulate.getMobile());
 				} else if (jsonObject.get("code").getAsString().equals("1050003")) {
 					glasspane.stop();
 					this.logsLabel.setText("没有查询到外卖订单信息");
@@ -495,7 +502,9 @@ public class wmFrame implements MouseListener {
 			
 
 		}else {
-			JOptionPane.showMessageDialog(null, "程序发生错误，请重启程序！", "失败", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "账号错误", "失败", JOptionPane.ERROR_MESSAGE);
+			this.glasspane.stop();
+			return;
 		}
 
 		System.gc();
@@ -504,14 +513,14 @@ public class wmFrame implements MouseListener {
 	public void dealDuties(String string) {
 		String str1;
 		String string2;
-		if (string.length() == 52) {
+		if (string.length() > 52) {
 			string = string.substring(0, string.length() - 4);
 			str1 = toolsClass.toStringHex2(string);
-			string2 = Encrypt.decrypt2(str1, gainTime.gainDate()).substring(3);
+			string2 = Encrypt.decrypt2(str1, gainTime.gainDate()).substring(11,17);
 			System.out.println(string2);
 			dutiesDo(string2);
 		} else if (string.length() == 32) {
-			string2 = dm.searchWithNum(string);
+			string2 = DatabaseManipulate.searchWithNum(string);
 			dutiesDo(string2);
 		} else {
 			str1 = toolsClass.toStringHex2(string);
@@ -529,6 +538,7 @@ public class wmFrame implements MouseListener {
 
 	public void initDataByVector(JsonObject json) {
 		this.list.removeAll(list);
+		this.vectorLabel.clear();
 		JsonArray jArray = new JsonArray();
 		JsonObject jsonobject = (JsonObject) json.get("data");
 		this.toPayLabel.setText(toolsClass.coinToYuan(jsonobject.get("deposit").getAsString()));

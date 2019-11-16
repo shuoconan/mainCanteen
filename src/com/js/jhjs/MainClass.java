@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.locks.Lock;
 
 import javax.swing.JOptionPane;
 
@@ -29,7 +30,7 @@ public class MainClass {
 	private settingFrame settingframe = null;
 	private LoginFrame lfs = null;
 	private CardCheck cc = null;
-	private DatabaseManipulate dm = new DatabaseManipulate();
+	private lxwmFrame lxf = null;
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -39,31 +40,31 @@ public class MainClass {
 	public MainClass() {
 		// TODO Auto-generated constructor stub
 		this.jcframe = new jcFrame("");
+		System.out.println("就餐模块加载完毕......");
 		this.wmframe = new wmFrame("");
+		System.out.println("外卖模块加载完毕......");
 		this.cc = new CardCheck();
+		this.lxf = new lxwmFrame("");
+		System.out.println("零星外卖加载完毕......");
 		this.settingframe = new settingFrame("");
 		this.jcframe.setOtherFrame(this.settingframe);
 		this.wmframe.setOtherFrame(this.settingframe);
+		this.lxf.setOtherFrame(this.settingframe);
 		System.out.println("窗口对象建立完毕");
 		SerialTools sTools = this.new SerialTools();
 		Set<CommPortIdentifier> portList = sTools.getPortList();
-		if(portList.size() == 0){
 			this.lfs = new LoginFrame(this.jcframe, this.wmframe);
-			this.settingframe.setOtherFrame(this.jcframe, this.wmframe, this.lfs, this.cc);
+			this.settingframe.setOtherFrame(this.jcframe, this.wmframe, this.lfs, this.lxf);
 			for (CommPortIdentifier cpif : portList) {
 				// 处理串口发来数据的线程
-				new Thread(() -> {
-					System.out.println("串口打开成功！");
-					SerialTools st = this.new SerialTools();
-					st.openSerialPort(cpif, 20);
-				}).start();
-
-			}
-		}else{
-			JOptionPane.showMessageDialog(null,"串口打开失败，请重新启动程序!" ,"错误" , JOptionPane.ERROR_MESSAGE);
-			System.exit(0);
-		}
-		
+					new Thread(() -> {
+						synchronized (SerialTools.class) {
+							SerialTools st = this.new SerialTools();
+							st.openSerialPort(cpif, 20);
+							System.out.println("串口打开成功！");
+						}
+					}).start();
+			}	
 	}
 
 	public void setSettingframe(boolean b) {
@@ -81,13 +82,13 @@ public class MainClass {
 		private SerialPort serialPort;
 		byte[] readBuffer = new byte[100];
 		protected String num = null;
+		private Lock lock;
 
 		public Set<CommPortIdentifier> getPortList() {
 			Enumeration tempPortList; // 枚举类
 			CommPortIdentifier portIp;
 			tempPortList = CommPortIdentifier.getPortIdentifiers();
 			while (tempPortList.hasMoreElements()) {
-
 				portIp = (CommPortIdentifier) tempPortList.nextElement();
 				portList.add(portIp);
 			}
@@ -96,7 +97,12 @@ public class MainClass {
 
 		public boolean openSerialPort(CommPortIdentifier portIp, int delay) {
 			try {
-				serialPort = (SerialPort) portIp.open(appName, delay);
+				if(portIp.isCurrentlyOwned()){
+					System.out.println("串口被占用！");
+				}else {
+					serialPort = (SerialPort) portIp.open(appName, delay);
+				}
+				
 			} catch (PortInUseException e) {
 				return false;
 			}
@@ -164,39 +170,43 @@ public class MainClass {
 
 		@Override
 		public void serialEvent(SerialPortEvent event) {
-			String string = "";
-			int b;
-			if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
-				try {
-					while (is.available() > 0) {
-						while ((b = is.read()) != -1) {
-							if (b <= 0xf) {
-								string += "0";
+				String string = "";
+				int b;
+				if (event.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
+					try {
+						while (is.available() > 0) {
+							while ((b = is.read()) != -1) {
+								if (b <= 0xf) {
+									string += "0";
+								}
+								string += Integer.toHexString(b & 0xff);
 							}
-							string += Integer.toHexString(b & 0xff);
-						}
-						System.out.println(string);
-						if (MainClass.this.lfs.getVisibles()) {
-							if (string.length() == 32) {
-								if(MainClass.this.dm.searchWithSuperNum(string)){
-									MainClass.this.wmframe.setVisible(true, "superuser");
-									MainClass.this.lfs.setVisible(false);
+							System.out.println(string);
+							if (MainClass.this.lfs.getVisibles()) {
+								if (string.length() == 32) {
+									if(DatabaseManipulate.searchWithSuperNum(string)){
+										MainClass.this.wmframe.setVisible(true, "superuser");
+										MainClass.this.lfs.setVisible(false);
+									}
+								}
+							} else {
+								if ((MainClass.this.jcframe.getVisible()) && (!MainClass.this.wmframe.getVisible())&& (!MainClass.this.lxf.getVisible())) {
+									System.out.println("就餐界面");
+									MainClass.this.jcframe.dealDuties(string);
+								}
+								if ((!MainClass.this.jcframe.getVisible()) && (MainClass.this.wmframe.getVisible())&& (!MainClass.this.lxf.getVisible())) {
+									System.out.println("外卖界面");
+									MainClass.this.wmframe.dealDuties(string);
+								}
+								if((!MainClass.this.jcframe.getVisible()) && (!MainClass.this.wmframe.getVisible())&& (MainClass.this.lxf.getVisible())){
+									System.out.println("零星外卖");
+									MainClass.this.lxf.dealDuties(string);
 								}
 							}
-						} else {
-							if ((MainClass.this.jcframe.getVisible()) && (!MainClass.this.wmframe.getVisible())) {
-								System.out.println("就餐界面");
-								MainClass.this.jcframe.dealDuties(string);
-							}
-							if ((!MainClass.this.jcframe.getVisible()) && (MainClass.this.wmframe.getVisible())) {
-								System.out.println("外卖界面");
-								MainClass.this.wmframe.dealDuties(string);
-							}
 						}
+					} catch (IOException e) {
 					}
-				} catch (IOException e) {
-				}
-			}
+				}			
 		}
 
 		public String putNumOut() {
