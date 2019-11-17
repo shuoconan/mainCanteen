@@ -1,5 +1,6 @@
 package com.js.jhjs;
 
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,7 +25,7 @@ import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
 import jdk.internal.util.xml.impl.ReaderUTF8;
 
-public class MainClass {
+public class MainClass{
 	private jcFrame jcframe = null;
 	private wmFrame wmframe = null;
 	private settingFrame settingframe = null;

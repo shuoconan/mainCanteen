@@ -2,6 +2,8 @@ package com.js.jhjs;
 
 import java.io.ByteArrayOutputStream;
 
+import javax.swing.JOptionPane;
+
 public class toolsClass {
 	private static final char[] HEX_CHAR = {'0', '1', '2', '3', '4', '5','6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 	private static String hexString = "0123456789ABCDEF";
@@ -11,7 +13,26 @@ public class toolsClass {
 		return str;
 	}
 	public static int yuanToDouble(String string){
-		return (int)(Double.parseDouble(string.substring(0,string.length()-1))*100);
+		string = string.substring(0,string.length()-1);
+		int i = string.lastIndexOf('.');
+		System.out.println("字符串长度为："+string.length());
+		System.out.println("小数点位置为："+i);
+		//小数点后一位
+		if (i==string.length()-2){
+			string = string.replace(".", "");
+			string = string + "0";
+			//小数点后两位
+		}else if (i==string.length()-3){
+        	string = string.replace(".", "");
+        	//没有小数点
+		}else if (i==-1){
+			string = string + "00";
+		}else{
+			JOptionPane.showMessageDialog(null, "请输入正确数值", "支付失败", JOptionPane.ERROR_MESSAGE);
+			return 0;
+		}
+		return  Integer.parseInt(string);
+				//(int)(Double.parseDouble(string.substring(0,string.length()-1))*100);
 	}
 	public static String howtoHexStrings(String s){
 		StringBuffer sb = new StringBuffer("");
